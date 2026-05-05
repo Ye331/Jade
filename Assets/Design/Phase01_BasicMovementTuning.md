@@ -27,6 +27,18 @@
 4. 调 `fallGravityMultiplier`，让下落更明确，不要飘太久。
 5. 最后调 `coyoteTime` 和 `jumpBufferTime`，让边缘跳和提前按跳更舒服。
 
+## 视觉反馈参数
+
+`PlayerVisualFeedback2D` 只负责临时角色代理的表现，不改变碰撞和移动计算。
+
+- `runTiltDegrees`：跑动时身体前倾角度。
+- `fastSpeedThreshold`：超过该水平速度后开启更明显的速度反馈。
+- `squashReturnSpeed`：拉伸、压缩恢复到正常比例的速度。
+- `landingShakeStrength`：落地镜头轻微震动强度，建议保持很小。
+- `landingShakeDuration`：落地震动持续时间。
+
+如果觉得角色“太软”，先降低拉伸压缩幅度或提高 `squashReturnSpeed`。如果觉得还是像方块滑动，先增加跑动前倾和拖尾可见度。
+
 ## 当前暂不包含
 
 - 墙滑、墙跳。

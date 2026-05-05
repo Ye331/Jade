@@ -14,6 +14,8 @@ namespace Jade.CameraTools
         private float xVelocity;
         private float yVelocity;
         private PlayerMotor2D targetMotor;
+        private float shakeTimer;
+        private float shakeStrength;
 
         public void Configure(Transform followTarget)
         {
@@ -41,7 +43,27 @@ namespace Jade.CameraTools
 
             float x = Mathf.SmoothDamp(transform.position.x, desired.x, ref xVelocity, horizontalSmoothTime);
             float y = Mathf.SmoothDamp(transform.position.y, desired.y, ref yVelocity, verticalSmoothTime);
-            transform.position = new Vector3(x, y, transform.position.z);
+            Vector3 shakeOffset = Vector3.zero;
+            if (shakeTimer > 0f)
+            {
+                shakeTimer -= Time.deltaTime;
+                shakeOffset = new Vector3(
+                    Random.Range(-shakeStrength, shakeStrength),
+                    Random.Range(-shakeStrength, shakeStrength),
+                    0f);
+            }
+            else
+            {
+                shakeStrength = 0f;
+            }
+
+            transform.position = new Vector3(x, y, transform.position.z) + shakeOffset;
+        }
+
+        public void Shake(float duration, float strength)
+        {
+            shakeTimer = Mathf.Max(shakeTimer, duration);
+            shakeStrength = Mathf.Max(shakeStrength, strength);
         }
     }
 }

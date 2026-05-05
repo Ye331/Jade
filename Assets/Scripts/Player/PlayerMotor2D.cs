@@ -19,10 +19,16 @@ namespace Jade.Player
         private float gravity;
         private float jumpVelocity;
         private bool isGrounded;
+        private bool wasGrounded;
+        private bool landedThisFrame;
+        private bool jumpedThisFrame;
         private int facingDirection = 1;
 
         public int FacingDirection => facingDirection;
         public bool IsGrounded => isGrounded;
+        public bool LandedThisFrame => landedThisFrame;
+        public bool JumpedThisFrame => jumpedThisFrame;
+        public Vector2 Velocity => body != null ? body.velocity : Vector2.zero;
 
         public void Configure(PlayerMovementSettings movementSettings)
         {
@@ -53,6 +59,10 @@ namespace Jade.Player
             {
                 return;
             }
+
+            landedThisFrame = false;
+            jumpedThisFrame = false;
+            wasGrounded = isGrounded;
 
             UpdateGroundedState();
             UpdateTimers();
@@ -107,6 +117,7 @@ namespace Jade.Player
             }
 
             isGrounded = foundGround && body.velocity.y <= 0.05f;
+            landedThisFrame = isGrounded && !wasGrounded;
 
             if (isGrounded)
             {
@@ -145,6 +156,7 @@ namespace Jade.Player
                 jumpBufferCounter = 0f;
                 coyoteCounter = 0f;
                 isGrounded = false;
+                jumpedThisFrame = true;
             }
 
             if (input.ConsumeJumpReleased() && body.velocity.y > 0f)
