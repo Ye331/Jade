@@ -18,14 +18,14 @@ MonoBehaviour:
   turnDeceleration: 125
   airAcceleration: 45
   airDeceleration: 30
-  jumpHeight: 4.2
-  timeToJumpApex: 0.42
+  jumpHeight: 3.35
+  timeToJumpApex: 0.39
   coyoteTime: 0.1
   jumpBufferTime: 0.12
   jumpCutVelocityMultiplier: 0.45
-  fallGravityMultiplier: 1.75
-  lowJumpGravityMultiplier: 2.25
-  maxFallSpeed: 18
+  fallGravityMultiplier: 1.85
+  lowJumpGravityMultiplier: 2.35
+  maxFallSpeed: 16.5
   groundLayer:
     serializedVersion: 2
     m_Bits: 4294967295

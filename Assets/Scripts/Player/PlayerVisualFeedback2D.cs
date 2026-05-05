@@ -13,9 +13,6 @@ namespace Jade.Player
         [SerializeField] private float runTiltDegrees = 7f;
         [SerializeField] private float fastSpeedThreshold = 5.5f;
         [SerializeField] private float squashReturnSpeed = 12f;
-        [SerializeField] private float landingShakeStrength = 0.06f;
-        [SerializeField] private float landingShakeDuration = 0.08f;
-
         private PlayerMotor2D motor;
         private Vector3 targetScale = Vector3.one;
         private float targetTilt;
@@ -117,12 +114,6 @@ namespace Jade.Player
             if (landingDust != null)
             {
                 landingDust.Play();
-            }
-
-            SimpleCameraFollow2D cameraFollow = Camera.main != null ? Camera.main.GetComponent<SimpleCameraFollow2D>() : null;
-            if (cameraFollow != null)
-            {
-                cameraFollow.Shake(landingShakeDuration, landingShakeStrength);
             }
         }
     }

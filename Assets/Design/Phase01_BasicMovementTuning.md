@@ -10,14 +10,14 @@
 - `turnDeceleration = 125`：反向输入时的转身减速，越高越干脆。
 - `airAcceleration = 45`：空中方向控制力度。
 - `airDeceleration = 30`：空中松开方向键后的减速力度。
-- `jumpHeight = 4.2`：长按跳跃时的大致跳跃高度。
-- `timeToJumpApex = 0.42`：到达跳跃最高点所需时间，越小越利落。
+- `jumpHeight = 3.35`：长按跳跃时的大致跳跃高度。
+- `timeToJumpApex = 0.39`：到达跳跃最高点所需时间，越小越利落。
 - `coyoteTime = 0.10`：离开平台后仍允许跳跃的时间。
 - `jumpBufferTime = 0.12`：落地前提前按跳的缓存时间。
 - `jumpCutVelocityMultiplier = 0.45`：松开跳跃键时保留的上升速度比例。
-- `fallGravityMultiplier = 1.75`：下落时重力倍率。
-- `lowJumpGravityMultiplier = 2.25`：松开跳跃键后的上升重力倍率。
-- `maxFallSpeed = 18`：最大下落速度。
+- `fallGravityMultiplier = 1.85`：下落时重力倍率。
+- `lowJumpGravityMultiplier = 2.35`：松开跳跃键后的上升重力倍率。
+- `maxFallSpeed = 16.5`：最大下落速度。
 
 ## 推荐调参顺序
 
@@ -34,8 +34,7 @@
 - `runTiltDegrees`：跑动时身体前倾角度。
 - `fastSpeedThreshold`：超过该水平速度后开启更明显的速度反馈。
 - `squashReturnSpeed`：拉伸、压缩恢复到正常比例的速度。
-- `landingShakeStrength`：落地镜头轻微震动强度，建议保持很小。
-- `landingShakeDuration`：落地震动持续时间。
+落地反馈只使用角色压缩和尘土粒子，不使用镜头震动。当前方向更偏灵动轻盈，避免落地显得过重。
 
 如果觉得角色“太软”，先降低拉伸压缩幅度或提高 `squashReturnSpeed`。如果觉得还是像方块滑动，先增加跑动前倾和拖尾可见度。
 

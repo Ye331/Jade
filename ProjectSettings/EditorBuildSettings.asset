@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Prototype/Phase01_BasicMovement.scene
     guid: 818e51ea0e424034b031330578c36e39
+  - enabled: 1
+    path: Assets/Scenes/Prototype/Phase02_GrayboxLevel.scene
+    guid: a4dadde7f574490186c34f78b9667c83
   m_configObjects: {}
