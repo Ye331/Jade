@@ -34,6 +34,7 @@ namespace Jade.World
             GameObject player = CreatePlayer(sprite);
             Camera cameraToUse = CreateCamera(player.transform);
             CreateBackground(cameraToUse);
+            CreateAtmosphere(sprite);
             CreateRoute(sprite);
             CreateCheckpoint(sprite, "Checkpoint_MidRoute", new Vector2(24f, -0.05f));
             CreateCollectibles(sprite);
@@ -124,10 +125,34 @@ namespace Jade.World
 
             SpriteRenderer renderer = panel.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
-            renderer.color = new Color(0.74f, 0.82f, 0.82f, 0.72f);
+            renderer.color = new Color(0.56f, 0.66f, 0.66f, 0.52f);
             renderer.sortingOrder = -30;
 
             ScaleBackgroundToCamera(panel.transform, sprite, cameraToUse, 1.08f);
+        }
+
+        private static void CreateAtmosphere(Sprite sprite)
+        {
+            GameObject root = new GameObject("Atmosphere_JadeMist");
+            CreateChildVisual(sprite, "Mist_Bottom", root.transform, new Vector2(24f, -4.85f), new Vector2(80f, 0.55f), new Color(0.58f, 0.9f, 0.82f, 0.08f), -18);
+            CreateChildVisual(sprite, "Mist_MidRoute", root.transform, new Vector2(30f, -1.75f), new Vector2(62f, 0.32f), new Color(0.72f, 1f, 0.92f, 0.06f), -18);
+            CreateChildVisual(sprite, "Distant_InkCanopy_Left", root.transform, new Vector2(-3f, -4.45f), new Vector2(10f, 1.05f), new Color(0.025f, 0.055f, 0.06f, 0.52f), -12);
+            CreateChildVisual(sprite, "Distant_InkCanopy_Right", root.transform, new Vector2(51f, -4.25f), new Vector2(13f, 1.15f), new Color(0.025f, 0.055f, 0.06f, 0.5f), -12);
+
+            Vector2[] motes =
+            {
+                new Vector2(5.5f, -0.9f),
+                new Vector2(16f, -1.65f),
+                new Vector2(23f, -3.05f),
+                new Vector2(31.5f, 0.55f),
+                new Vector2(40.5f, 2.35f),
+                new Vector2(50.5f, 2.05f)
+            };
+
+            for (int i = 0; i < motes.Length; i++)
+            {
+                CreateChildVisual(sprite, "JadeMote_" + (i + 1), root.transform, motes[i], new Vector2(0.12f, 0.12f), new Color(0.45f, 1f, 0.86f, 0.55f), -10);
+            }
         }
 
         private void CreateCheckpoint(Sprite sprite, string name, Vector2 position)
@@ -140,7 +165,10 @@ namespace Jade.World
             trigger.offset = new Vector2(0f, 0.55f);
             trigger.isTrigger = true;
 
-            SpriteRenderer marker = CreateChildVisual(sprite, "Marker", checkpoint.transform, Vector2.zero, new Vector2(0.35f, 1.6f), new Color(0.25f, 0.45f, 0.42f, 0.75f), 15);
+            CreateChildVisual(sprite, "Shrine_BaseInk", checkpoint.transform, new Vector2(0f, -0.15f), new Vector2(0.5f, 1.1f), new Color(0.06f, 0.14f, 0.14f, 0.88f), 14);
+            CreateChildVisual(sprite, "Shrine_Cap", checkpoint.transform, new Vector2(0f, 0.55f), new Vector2(0.95f, 0.16f), new Color(0.12f, 0.28f, 0.26f, 0.92f), 15);
+            SpriteRenderer marker = CreateChildVisual(sprite, "Shrine_JadeCore", checkpoint.transform, new Vector2(0f, 0.08f), new Vector2(0.22f, 1.35f), new Color(0.35f, 0.8f, 0.72f, 0.72f), 16);
+            CreateChildVisual(sprite, "Shrine_Glow", checkpoint.transform, new Vector2(0f, 0.1f), new Vector2(0.82f, 1.55f), new Color(0.42f, 1f, 0.86f, 0.12f), 13);
             Checkpoint2D checkpointComponent = checkpoint.AddComponent<Checkpoint2D>();
             checkpointComponent.Configure(checkpoint.transform, marker);
         }
@@ -161,9 +189,11 @@ namespace Jade.World
 
             SpriteRenderer visual = collectible.AddComponent<SpriteRenderer>();
             visual.sprite = sprite;
-            visual.color = new Color(0.35f, 1f, 0.85f, 0.95f);
-            visual.sortingOrder = 16;
-            collectible.transform.localScale = new Vector3(0.28f, 0.28f, 1f);
+            visual.color = new Color(0.7f, 1f, 0.9f, 0.98f);
+            visual.sortingOrder = 18;
+            collectible.transform.localScale = new Vector3(0.22f, 0.36f, 1f);
+            CreateChildVisual(sprite, "JadeShard_Glow", collectible.transform, Vector2.zero, new Vector2(3.2f, 2.2f), new Color(0.45f, 1f, 0.86f, 0.18f), 17);
+            CreateChildVisual(sprite, "JadeShard_Core", collectible.transform, Vector2.zero, new Vector2(0.45f, 1.35f), new Color(1f, 1f, 0.9f, 0.9f), 19);
 
             Collectible2D collectibleComponent = collectible.AddComponent<Collectible2D>();
             collectibleComponent.Configure(visual);
@@ -179,7 +209,11 @@ namespace Jade.World
             trigger.offset = new Vector2(0f, 1.15f);
             trigger.isTrigger = true;
 
-            SpriteRenderer marker = CreateChildVisual(sprite, "Goal_JadeGate", goal.transform, new Vector2(0f, 1.05f), new Vector2(0.6f, 2.1f), new Color(0.45f, 0.9f, 0.8f, 0.9f), 15);
+            CreateChildVisual(sprite, "Goal_LeftPillar", goal.transform, new Vector2(-0.45f, 1.05f), new Vector2(0.24f, 2.15f), new Color(0.08f, 0.18f, 0.17f, 0.95f), 15);
+            CreateChildVisual(sprite, "Goal_RightPillar", goal.transform, new Vector2(0.45f, 1.05f), new Vector2(0.24f, 2.15f), new Color(0.08f, 0.18f, 0.17f, 0.95f), 15);
+            CreateChildVisual(sprite, "Goal_TopLintel", goal.transform, new Vector2(0f, 2.08f), new Vector2(1.25f, 0.22f), new Color(0.12f, 0.3f, 0.27f, 0.95f), 16);
+            SpriteRenderer marker = CreateChildVisual(sprite, "Goal_JadeGate", goal.transform, new Vector2(0f, 1.1f), new Vector2(0.62f, 1.8f), new Color(0.45f, 0.95f, 0.82f, 0.58f), 17);
+            CreateChildVisual(sprite, "Goal_Glow", goal.transform, new Vector2(0f, 1.1f), new Vector2(1.55f, 2.35f), new Color(0.45f, 1f, 0.86f, 0.12f), 14);
             LevelGoal2D goalComponent = goal.AddComponent<LevelGoal2D>();
             goalComponent.Configure(marker);
         }
@@ -229,9 +263,12 @@ namespace Jade.World
             SpriteRenderer renderer = box.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
             renderer.color = color;
+            renderer.sortingOrder = 0;
 
             BoxCollider2D collider = box.AddComponent<BoxCollider2D>();
             collider.size = Vector2.one;
+
+            AddPlatformArt(sprite, box.transform);
         }
 
         private static SpriteRenderer CreateChildVisual(Sprite sprite, string name, Transform parent, Vector2 localPosition, Vector2 scale, Color color, int sortingOrder)
@@ -246,6 +283,15 @@ namespace Jade.World
             renderer.color = color;
             renderer.sortingOrder = sortingOrder;
             return renderer;
+        }
+
+        private static void AddPlatformArt(Sprite sprite, Transform platform)
+        {
+            CreateChildVisual(sprite, "InkStone_Shadow", platform, new Vector2(0f, -0.47f), new Vector2(1f, 0.16f), new Color(0.02f, 0.035f, 0.04f, 0.48f), -1);
+            CreateChildVisual(sprite, "InkStone_TopJadeEdge", platform, new Vector2(0f, 0.48f), new Vector2(1f, 0.08f), new Color(0.42f, 0.9f, 0.78f, 0.72f), 3);
+            CreateChildVisual(sprite, "InkStone_SurfaceMist", platform, new Vector2(0f, 0.36f), new Vector2(0.92f, 0.12f), new Color(0.74f, 1f, 0.9f, 0.12f), 2);
+            CreateChildVisual(sprite, "InkStone_LeftCrack", platform, new Vector2(-0.28f, 0.08f), new Vector2(0.035f, 0.38f), new Color(0.43f, 0.82f, 0.72f, 0.28f), 2);
+            CreateChildVisual(sprite, "InkStone_RightCrack", platform, new Vector2(0.27f, -0.06f), new Vector2(0.03f, 0.26f), new Color(0.43f, 0.82f, 0.72f, 0.2f), 2);
         }
 
         private static SpriteRenderer CreateAnimatedCharacterVisual(Transform visualRoot)
@@ -356,11 +402,11 @@ namespace Jade.World
             Color[] colors =
             {
                 new Color(0.18f, 0.22f, 0.24f),
-                new Color(0.23f, 0.28f, 0.3f),
-                new Color(0.2f, 0.3f, 0.28f),
-                new Color(0.16f, 0.2f, 0.24f),
-                new Color(0.24f, 0.25f, 0.22f),
-                new Color(0.3f, 0.25f, 0.2f)
+                new Color(0.15f, 0.21f, 0.22f),
+                new Color(0.13f, 0.23f, 0.21f),
+                new Color(0.12f, 0.18f, 0.21f),
+                new Color(0.19f, 0.22f, 0.19f),
+                new Color(0.2f, 0.18f, 0.16f)
             };
 
             return colors[Mathf.Clamp(index, 0, colors.Length - 1)];
