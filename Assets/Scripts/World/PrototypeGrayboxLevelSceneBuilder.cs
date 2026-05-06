@@ -10,6 +10,18 @@ namespace Jade.World
         [SerializeField] private Camera sceneCamera;
 
         private static Sprite squareSprite;
+        private static Sprite backgroundSprite;
+        private static readonly string[] CharacterFrameNames =
+        {
+            "Idle01",
+            "Idle02",
+            "Run01",
+            "Run02",
+            "Run03",
+            "Run04",
+            "Jump",
+            "Fall"
+        };
 
         private void Awake()
         {
@@ -20,7 +32,8 @@ namespace Jade.World
         {
             Sprite sprite = GetSquareSprite();
             GameObject player = CreatePlayer(sprite);
-            CreateCamera(player.transform);
+            Camera cameraToUse = CreateCamera(player.transform);
+            CreateBackground(cameraToUse);
             CreateRoute(sprite);
             CreateCheckpoint(sprite, "Checkpoint_MidRoute", new Vector2(24f, -0.05f));
             CreateCollectibles(sprite);
@@ -50,7 +63,7 @@ namespace Jade.World
             return player;
         }
 
-        private void CreateCamera(Transform target)
+        private Camera CreateCamera(Transform target)
         {
             Camera cameraToUse = sceneCamera != null ? sceneCamera : Camera.main;
             if (cameraToUse == null)
@@ -73,6 +86,7 @@ namespace Jade.World
             }
 
             follow.Configure(target);
+            return cameraToUse;
         }
 
         private void CreateRoute(Sprite sprite)
@@ -93,6 +107,27 @@ namespace Jade.World
             CreateBox(sprite, "ClimbStep_03", new Vector2(39f, 1.8f), new Vector2(2.4f, 0.45f), PlatformColor(4));
             CreateBox(sprite, "Final_Runup", new Vector2(46f, 1.35f), new Vector2(8f, 0.5f), PlatformColor(5));
             CreateBox(sprite, "Goal_Platform", new Vector2(55f, 1.35f), new Vector2(4f, 0.5f), PlatformColor(5));
+        }
+
+        private static void CreateBackground(Camera cameraToUse)
+        {
+            Sprite sprite = GetBackgroundSprite();
+            if (sprite == null || cameraToUse == null)
+            {
+                return;
+            }
+
+            GameObject panel = new GameObject("Background_JadeMythForest_CameraLayer");
+            panel.transform.SetParent(cameraToUse.transform);
+            panel.transform.localPosition = new Vector3(0f, 0.15f, 12f);
+            panel.transform.localRotation = Quaternion.identity;
+
+            SpriteRenderer renderer = panel.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.color = new Color(0.74f, 0.82f, 0.82f, 0.72f);
+            renderer.sortingOrder = -30;
+
+            ScaleBackgroundToCamera(panel.transform, sprite, cameraToUse, 1.08f);
         }
 
         private void CreateCheckpoint(Sprite sprite, string name, Vector2 position)
@@ -167,17 +202,22 @@ namespace Jade.World
             visualRoot.transform.SetParent(player.transform);
             visualRoot.transform.localPosition = Vector3.zero;
 
-            CreateChildVisual(sprite, "Body_InkSilhouette", visualRoot.transform, new Vector2(0f, -0.04f), new Vector2(0.54f, 0.95f), new Color(0.08f, 0.12f, 0.13f), 12);
-            CreateChildVisual(sprite, "Head_JadeGlow", visualRoot.transform, new Vector2(0.05f, 0.62f), new Vector2(0.36f, 0.32f), new Color(0.35f, 0.95f, 0.86f), 13);
-            CreateChildVisual(sprite, "Tail_Ribbon", visualRoot.transform, new Vector2(-0.36f, 0.14f), new Vector2(0.48f, 0.12f), new Color(0.18f, 0.85f, 0.78f, 0.78f), 11);
-            CreateChildVisual(sprite, "Foot_Shadow", visualRoot.transform, new Vector2(0f, -0.6f), new Vector2(0.68f, 0.1f), new Color(0.03f, 0.04f, 0.04f, 0.65f), 9);
+            SpriteRenderer characterRenderer = CreateAnimatedCharacterVisual(visualRoot.transform);
+            if (characterRenderer != null)
+            {
+                PlayerSpriteAnimator2D animator = player.AddComponent<PlayerSpriteAnimator2D>();
+                animator.Configure(characterRenderer, LoadCharacterFrameTextures(), 250f);
+            }
+            else
+            {
+                CreateSpiritAnimalProxy(sprite, visualRoot.transform);
+            }
 
             ParticleSystem landingDust = CreateDust("LandingDust", player.transform, new Vector3(0f, -0.78f, 0f), false);
             ParticleSystem runDust = CreateDust("RunDust", player.transform, new Vector3(-0.25f, -0.78f, 0f), true);
-            TrailRenderer trail = CreateTrail(visualRoot.transform);
 
             PlayerVisualFeedback2D feedback = player.AddComponent<PlayerVisualFeedback2D>();
-            feedback.Configure(visualRoot.transform, landingDust, runDust, trail);
+            feedback.Configure(visualRoot.transform, landingDust, runDust, null);
         }
 
         private static void CreateBox(Sprite sprite, string name, Vector2 position, Vector2 size, Color color)
@@ -206,6 +246,66 @@ namespace Jade.World
             renderer.color = color;
             renderer.sortingOrder = sortingOrder;
             return renderer;
+        }
+
+        private static SpriteRenderer CreateAnimatedCharacterVisual(Transform visualRoot)
+        {
+            Texture2D[] frameTextures = LoadCharacterFrameTextures();
+            if (frameTextures == null)
+            {
+                return null;
+            }
+
+            GameObject spriteObject = new GameObject("JadeQilin_FrameSprite");
+            spriteObject.transform.SetParent(visualRoot);
+            spriteObject.transform.localPosition = new Vector3(0f, -0.68f, 0f);
+            spriteObject.transform.localScale = Vector3.one;
+
+            SpriteRenderer renderer = spriteObject.AddComponent<SpriteRenderer>();
+            renderer.sortingOrder = 16;
+            return renderer;
+        }
+
+        private static Texture2D[] LoadCharacterFrameTextures()
+        {
+            Texture2D[] textures = new Texture2D[CharacterFrameNames.Length];
+            for (int i = 0; i < CharacterFrameNames.Length; i++)
+            {
+                textures[i] = Resources.Load<Texture2D>("Characters/JadeQilinFrames/JadeQilin_" + CharacterFrameNames[i]);
+                if (textures[i] == null)
+                {
+                    return null;
+                }
+            }
+
+            return textures;
+        }
+
+        private static void CreateSpiritAnimalProxy(Sprite sprite, Transform visualRoot)
+        {
+            Color ink = new Color(0.12f, 0.24f, 0.23f);
+            Color deepInk = new Color(0.06f, 0.12f, 0.13f);
+            Color jade = new Color(0.4f, 1f, 0.86f, 0.95f);
+            Color paleJade = new Color(0.72f, 1f, 0.92f, 0.95f);
+
+            CreateChildVisual(sprite, "Tail_Ribbon_Long", visualRoot, new Vector2(-0.58f, 0.12f), new Vector2(0.86f, 0.14f), new Color(0.42f, 1f, 0.9f, 0.62f), 10);
+            CreateChildVisual(sprite, "Tail_Ribbon_Tip", visualRoot, new Vector2(-0.94f, 0.28f), new Vector2(0.34f, 0.1f), new Color(0.62f, 1f, 0.94f, 0.65f), 10);
+            CreateChildVisual(sprite, "Tail_Ink_Base", visualRoot, new Vector2(-0.32f, 0.04f), new Vector2(0.36f, 0.1f), deepInk, 11);
+            CreateChildVisual(sprite, "Body_JadeInk", visualRoot, new Vector2(0f, -0.12f), new Vector2(0.68f, 0.46f), ink, 12);
+            CreateChildVisual(sprite, "Belly_Mist", visualRoot, new Vector2(0.08f, -0.2f), new Vector2(0.44f, 0.18f), new Color(0.56f, 0.9f, 0.78f, 0.55f), 13);
+            CreateChildVisual(sprite, "Chest_JadeCore", visualRoot, new Vector2(0.26f, 0.02f), new Vector2(0.15f, 0.22f), jade, 15);
+            CreateChildVisual(sprite, "Head_JadeInk", visualRoot, new Vector2(0.39f, 0.31f), new Vector2(0.4f, 0.32f), ink, 13);
+            CreateChildVisual(sprite, "Muzzle_Glow", visualRoot, new Vector2(0.62f, 0.25f), new Vector2(0.22f, 0.14f), new Color(0.5f, 0.95f, 0.82f, 0.72f), 14);
+            CreateChildVisual(sprite, "Eye_Jade", visualRoot, new Vector2(0.53f, 0.38f), new Vector2(0.08f, 0.07f), paleJade, 16);
+            CreateChildVisual(sprite, "Ear_Back", visualRoot, new Vector2(0.22f, 0.58f), new Vector2(0.12f, 0.32f), new Color(0.16f, 0.36f, 0.32f), 12);
+            CreateChildVisual(sprite, "Ear_Front_Glow", visualRoot, new Vector2(0.43f, 0.58f), new Vector2(0.1f, 0.3f), new Color(0.48f, 0.98f, 0.84f, 0.9f), 15);
+            CreateChildVisual(sprite, "Horn_Jade_A", visualRoot, new Vector2(0.35f, 0.76f), new Vector2(0.07f, 0.24f), paleJade, 16);
+            CreateChildVisual(sprite, "Horn_Jade_B", visualRoot, new Vector2(0.49f, 0.73f), new Vector2(0.06f, 0.2f), paleJade, 16);
+            CreateChildVisual(sprite, "Leg_Front", visualRoot, new Vector2(0.24f, -0.46f), new Vector2(0.1f, 0.34f), deepInk, 12);
+            CreateChildVisual(sprite, "Leg_Back", visualRoot, new Vector2(-0.24f, -0.46f), new Vector2(0.1f, 0.34f), deepInk, 12);
+            CreateChildVisual(sprite, "Hoof_Front_Glow", visualRoot, new Vector2(0.24f, -0.66f), new Vector2(0.14f, 0.06f), jade, 15);
+            CreateChildVisual(sprite, "Hoof_Back_Glow", visualRoot, new Vector2(-0.24f, -0.66f), new Vector2(0.14f, 0.06f), jade, 15);
+            CreateChildVisual(sprite, "Foot_Shadow", visualRoot, new Vector2(0f, -0.72f), new Vector2(0.78f, 0.06f), new Color(0.03f, 0.04f, 0.04f, 0.48f), 9);
         }
 
         private static ParticleSystem CreateDust(string name, Transform parent, Vector3 localPosition, bool loop)
@@ -251,25 +351,6 @@ namespace Jade.World
             return particles;
         }
 
-        private static TrailRenderer CreateTrail(Transform parent)
-        {
-            GameObject trailObject = new GameObject("SpeedTrail_JadeRibbon");
-            trailObject.transform.SetParent(parent);
-            trailObject.transform.localPosition = new Vector3(-0.48f, 0.24f, 0f);
-
-            TrailRenderer trail = trailObject.AddComponent<TrailRenderer>();
-            trail.time = 0.16f;
-            trail.startWidth = 0.16f;
-            trail.endWidth = 0f;
-            trail.emitting = false;
-            trail.sortingOrder = 7;
-            trail.material = new Material(Shader.Find("Sprites/Default"));
-            trail.startColor = new Color(0.38f, 1f, 0.9f, 0.5f);
-            trail.endColor = new Color(0.38f, 1f, 0.9f, 0f);
-
-            return trail;
-        }
-
         private static Color PlatformColor(int index)
         {
             Color[] colors =
@@ -300,5 +381,34 @@ namespace Jade.World
             squareSprite.name = "Runtime_PrototypeSquare";
             return squareSprite;
         }
+
+        private static Sprite GetBackgroundSprite()
+        {
+            if (backgroundSprite != null)
+            {
+                return backgroundSprite;
+            }
+
+            Texture2D texture = Resources.Load<Texture2D>("Backgrounds/JadeMythForest_Background");
+            if (texture == null)
+            {
+                return null;
+            }
+
+            backgroundSprite = Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100f);
+            backgroundSprite.name = "JadeMythForest_Background_RuntimeSprite";
+            return backgroundSprite;
+        }
+
+        private static void ScaleBackgroundToCamera(Transform background, Sprite sprite, Camera cameraToUse, float overscan)
+        {
+            float cameraHeight = cameraToUse.orthographicSize * 2f * overscan;
+            float aspect = cameraToUse.aspect > 0f ? cameraToUse.aspect : 16f / 9f;
+            float cameraWidth = cameraHeight * aspect;
+            Vector2 spriteSize = sprite.bounds.size;
+            float scale = Mathf.Max(cameraWidth / spriteSize.x, cameraHeight / spriteSize.y);
+            background.localScale = new Vector3(scale, scale, 1f);
+        }
+
     }
 }
