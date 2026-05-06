@@ -34,7 +34,6 @@ namespace Jade.World
             GameObject player = CreatePlayer(sprite);
             Camera cameraToUse = CreateCamera(player.transform);
             CreateBackground(cameraToUse);
-            CreateAtmosphere(sprite);
             CreatePlatforms(sprite);
             CreateRespawnZone();
         }
@@ -115,11 +114,11 @@ namespace Jade.World
         private void CreatePlatforms(Sprite sprite)
         {
             CreateBox(sprite, "Ground_LongRun", new Vector2(-2f, -3f), new Vector2(18f, 1f), new Color(0.18f, 0.22f, 0.24f));
-            CreateBox(sprite, "Platform_EdgeBuffer_A", new Vector2(10.5f, -1.4f), new Vector2(3f, 0.45f), new Color(0.15f, 0.21f, 0.22f));
-            CreateBox(sprite, "Platform_EdgeBuffer_B", new Vector2(15f, -0.2f), new Vector2(2.5f, 0.45f), new Color(0.15f, 0.21f, 0.22f));
-            CreateBox(sprite, "Platform_JumpHeight_Low", new Vector2(20f, -1.6f), new Vector2(2.5f, 0.45f), new Color(0.13f, 0.23f, 0.21f));
-            CreateBox(sprite, "Platform_JumpHeight_Mid", new Vector2(24f, 0.1f), new Vector2(2.5f, 0.45f), new Color(0.13f, 0.23f, 0.21f));
-            CreateBox(sprite, "Platform_JumpHeight_High", new Vector2(28f, 1.8f), new Vector2(3.5f, 0.45f), new Color(0.13f, 0.23f, 0.21f));
+            CreateBox(sprite, "Platform_EdgeBuffer_A", new Vector2(10.5f, -1.4f), new Vector2(3f, 0.45f), new Color(0.23f, 0.28f, 0.3f));
+            CreateBox(sprite, "Platform_EdgeBuffer_B", new Vector2(15f, -0.2f), new Vector2(2.5f, 0.45f), new Color(0.23f, 0.28f, 0.3f));
+            CreateBox(sprite, "Platform_JumpHeight_Low", new Vector2(20f, -1.6f), new Vector2(2.5f, 0.45f), new Color(0.2f, 0.3f, 0.28f));
+            CreateBox(sprite, "Platform_JumpHeight_Mid", new Vector2(24f, 0.1f), new Vector2(2.5f, 0.45f), new Color(0.2f, 0.3f, 0.28f));
+            CreateBox(sprite, "Platform_JumpHeight_High", new Vector2(28f, 1.8f), new Vector2(3.5f, 0.45f), new Color(0.2f, 0.3f, 0.28f));
         }
 
         private static void CreateBackground(Camera cameraToUse)
@@ -137,32 +136,10 @@ namespace Jade.World
 
             SpriteRenderer renderer = panel.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
-            renderer.color = new Color(0.56f, 0.66f, 0.66f, 0.52f);
+            renderer.color = new Color(0.74f, 0.82f, 0.82f, 0.72f);
             renderer.sortingOrder = -30;
 
             ScaleBackgroundToCamera(panel.transform, sprite, cameraToUse, 1.08f);
-        }
-
-        private static void CreateAtmosphere(Sprite sprite)
-        {
-            GameObject root = new GameObject("Atmosphere_JadeMist");
-            CreateVisualPart(sprite, "Mist_Bottom", root.transform, new Vector2(13f, -4.45f), new Vector2(58f, 0.48f), new Color(0.58f, 0.9f, 0.82f, 0.08f), -18);
-            CreateVisualPart(sprite, "Mist_MidPlatforms", root.transform, new Vector2(18f, -0.85f), new Vector2(38f, 0.28f), new Color(0.72f, 1f, 0.92f, 0.06f), -18);
-            CreateVisualPart(sprite, "Distant_InkCanopy_Left", root.transform, new Vector2(-6f, -4.05f), new Vector2(8f, 0.85f), new Color(0.025f, 0.055f, 0.06f, 0.48f), -12);
-            CreateVisualPart(sprite, "Distant_InkCanopy_Right", root.transform, new Vector2(29f, -3.9f), new Vector2(10f, 0.95f), new Color(0.025f, 0.055f, 0.06f, 0.46f), -12);
-
-            Vector2[] motes =
-            {
-                new Vector2(6.5f, -0.55f),
-                new Vector2(13.5f, 0.35f),
-                new Vector2(21.5f, 1.1f),
-                new Vector2(28.5f, 2.8f)
-            };
-
-            for (int i = 0; i < motes.Length; i++)
-            {
-                CreateVisualPart(sprite, "JadeMote_" + (i + 1), root.transform, motes[i], new Vector2(0.12f, 0.12f), new Color(0.45f, 1f, 0.86f, 0.55f), -10);
-            }
         }
 
         private void CreateRespawnZone()
@@ -186,12 +163,9 @@ namespace Jade.World
             SpriteRenderer renderer = box.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
             renderer.color = color;
-            renderer.sortingOrder = 0;
 
             BoxCollider2D collider = box.AddComponent<BoxCollider2D>();
             collider.size = Vector2.one;
-
-            AddPlatformArt(sprite, box.transform);
         }
 
         private static void CreateVisualPart(Sprite sprite, string name, Transform parent, Vector2 localPosition, Vector2 scale, Color color, int sortingOrder)
@@ -205,15 +179,6 @@ namespace Jade.World
             renderer.sprite = sprite;
             renderer.color = color;
             renderer.sortingOrder = sortingOrder;
-        }
-
-        private static void AddPlatformArt(Sprite sprite, Transform platform)
-        {
-            CreateVisualPart(sprite, "InkStone_Shadow", platform, new Vector2(0f, -0.47f), new Vector2(1f, 0.16f), new Color(0.02f, 0.035f, 0.04f, 0.48f), -1);
-            CreateVisualPart(sprite, "InkStone_TopJadeEdge", platform, new Vector2(0f, 0.48f), new Vector2(1f, 0.08f), new Color(0.42f, 0.9f, 0.78f, 0.72f), 3);
-            CreateVisualPart(sprite, "InkStone_SurfaceMist", platform, new Vector2(0f, 0.36f), new Vector2(0.92f, 0.12f), new Color(0.74f, 1f, 0.9f, 0.12f), 2);
-            CreateVisualPart(sprite, "InkStone_LeftCrack", platform, new Vector2(-0.28f, 0.08f), new Vector2(0.035f, 0.38f), new Color(0.43f, 0.82f, 0.72f, 0.28f), 2);
-            CreateVisualPart(sprite, "InkStone_RightCrack", platform, new Vector2(0.27f, -0.06f), new Vector2(0.03f, 0.26f), new Color(0.43f, 0.82f, 0.72f, 0.2f), 2);
         }
 
         private static SpriteRenderer CreateAnimatedCharacterVisual(Transform visualRoot)
