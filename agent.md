@@ -33,7 +33,13 @@
 
 ## 工程约定
 
-当前工程是 Unity/团结 2D 项目，编辑器版本见 `ProjectSettings/ProjectVersion.txt`。`Assets` 下目前只有默认 `SampleScene`，说明项目仍处于起步阶段。
+当前工程是 Unity/团结 2D 项目，编辑器版本见 `ProjectSettings/ProjectVersion.txt`：Unity 2022.3.61t11 / Tuanjie 1.6.10。项目已经从空工程推进到可运行的 2D 移动与灰盒关卡原型。
+
+当前 Build Settings 中包含：
+
+- `Assets/Scenes/SampleScene.scene`
+- `Assets/Scenes/Prototype/Phase01_BasicMovement.scene`
+- `Assets/Scenes/Prototype/Phase02_GrayboxLevel.scene`
 
 推荐的目录方向：
 
@@ -51,6 +57,53 @@
 输入方案先使用现有 Unity 旧 InputManager 启动原型。等移动、战斗和 UI 需求稳定后，如果需要手柄重绑定、多设备输入或更完整的输入配置，再迁移到 Unity Input System。
 
 原型资产允许使用纯色块、SpriteShape、Tilemap、粒子和简单水墨贴图。正式资产需要记录尺寸、pivot、动画帧率、命名规则和用途，避免替换素材时破坏碰撞、动画或镜头构图。
+
+## 当前落档：2026-05-09
+
+### 当前可玩状态
+
+- `Phase01_BasicMovement` 已经具备基础跑跳原型：横向移动、地面/空中加减速、跳跃、可变跳高、土狼时间、跳跃缓冲、掉落复位和平滑跟随相机。
+- `Phase02_GrayboxLevel` 已经具备一段完整灰盒小关卡：长跑起步、短平台跳跃、下层可选收集路线、中段检查点、上升平台、终点触发和掉落复活。
+- 玩家角色当前优先使用 `Assets/Resources/Prefabs/Player/JadeQilinPlayer.prefab`。如果 prefab 或动画帧资源不可用，场景构建器仍保留程序化临时灵兽代理作为兜底。
+- 视觉方向已从纯方块代理推进到玉麒麟临时帧与 Animator 管线：Idle、Run、Turn、JumpStart、JumpRise、JumpApex、Fall、Land。
+- 背景已接入 `JadeMythForest_Background`，作为相机子物体的远景氛围层，用于验证中式神话水墨剪影气质。
+
+### 已实现脚本职责
+
+- `PlayerInputReader`：读取旧 InputManager 的 Horizontal 与 Jump 输入，并提供按下/松开消费接口。
+- `PlayerMotor2D`：负责 Rigidbody2D 移动、跳跃、重力、落地检测、朝向、出生点和复活点。
+- `PlayerMovementSettings`：集中保存移动手感参数，当前主配置为 `Assets/Scripts/Player/LightweightMovement.asset`。
+- `PlayerVisualFeedback2D`：负责视觉根节点翻转、前倾、拉伸压缩、落地尘土和跑动尘土，不改变物理碰撞。
+- `PlayerAnimationDriver2D`：把移动状态写入 Animator 参数，并根据跑速轻微调整 Run 播放速度。
+- `SimpleCameraFollow2D`：负责相机平滑跟随、前视偏移和简单震屏接口。
+- `PrototypeBasicMovementSceneBuilder`：运行时生成 Phase01 手感测试场景。
+- `PrototypeGrayboxLevelSceneBuilder`：运行时生成 Phase02 灰盒关卡、检查点、收集物、终点和掉落复位区。
+- `Checkpoint2D`：触发后更新玩家复活点，并改变检查点显示颜色。
+- `Collectible2D`：提供最小收集反馈，当前只记录静态计数并关闭对象。
+- `LevelGoal2D`：提供关卡结束触发和颜色反馈。
+- `RespawnZone2D`：玩家掉落到触发区后回到当前出生点。
+
+### 美术与动画管线
+
+- 临时低清帧位于 `Assets/Resources/Characters/JadeQilinFrames/`，用于当前原型快速验证。
+- 正式高分辨率帧预留在 `Assets/Resources/Characters/JadeQilinHighResFrames/`，规格见 `Assets/Design/JadeQilin_AnimationImportSpec.md`。
+- 编辑器菜单 `Jade > Build Jade Qilin Player Assets` 会重建动画片段、Animator Controller 和玩家 prefab。
+- `JadeQilinSpriteImportPostprocessor` 会自动为玉麒麟帧图应用 2D Sprite、底部中心 pivot、无压缩、无 mipmap、512 PPU 等导入设置。
+
+### 当前范围说明
+
+- Phase01 当前实际交付的是“基础移动手感原型”，暂不包含墙滑、墙跳、冲刺、二段跳、攀爬、战斗、生命系统和正式 UI。
+- Phase02 当前实际交付的是“灰盒路线验证”，暂不包含能力门、持久化存档、敌人、正式地图 UI 和正式关卡美术。
+- 当前检查点只更新本次 Play Mode 内的复活位置，不写入磁盘存档。
+- 当前收集物只做最小反馈，不保存收集状态，也不驱动奖励系统。
+
+### 下一步建议
+
+1. 先在 Unity Play Mode 里完整跑通 `Phase01_BasicMovement` 和 `Phase02_GrayboxLevel`，记录手感问题。
+2. 调整 `LightweightMovement.asset`，优先处理跳高、下落速度、空中转向和短平台容错。
+3. 补一份 Phase02 课程汇报截图清单：起点、下层收集、检查点、上升平台、终点。
+4. 确认高分辨率玉麒麟帧命名与 `JadeQilin_AnimationImportSpec.md` 一致后，再运行构建菜单替换当前临时帧。
+5. 下一阶段再决定先做冲刺/墙跳，还是先做一个简单能力门与回访路线。
 
 ## 分阶段路线
 

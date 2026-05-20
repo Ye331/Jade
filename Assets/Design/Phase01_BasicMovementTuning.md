@@ -2,6 +2,17 @@
 
 目标手感：轻盈、响应快、有容错。当前阶段只做基础操作，不做冲刺、墙跳、二段跳或技能解锁。
 
+## 当前实现落档
+
+- 测试场景：`Assets/Scenes/Prototype/Phase01_BasicMovement.scene`
+- 场景生成器：`PrototypeBasicMovementSceneBuilder`
+- 玩家移动：`PlayerInputReader` + `PlayerMotor2D` + `PlayerMovementSettings`
+- 视觉反馈：`PlayerVisualFeedback2D` + `PlayerAnimationDriver2D`
+- 相机：`SimpleCameraFollow2D`
+- 掉落重置：`RespawnZone2D`
+- 玩家优先使用 `Assets/Resources/Prefabs/Player/JadeSpiritPlayer.prefab`；新 prefab 不可用时回退到旧 `JadeQilinPlayer.prefab`，再回退到场景生成器内的临时 sprite 或程序化角色代理。
+- 当前场景重点测试长跑、短平台边缘容错、高低平台跳跃、可变跳高、相机跟随和掉落复位。
+
 ## 默认参数
 
 - `maxRunSpeed = 8`：最大水平速度。
@@ -46,3 +57,10 @@
 - 攀爬、抓墙。
 - 技能解锁。
 - 战斗、敌人、存档、地图 UI。
+
+## 下一轮调参关注点
+
+- 如果短平台太简单，优先缩短平台间距或降低 `coyoteTime`，不要先加新能力。
+- 如果跳跃显得飘，优先提高 `fallGravityMultiplier` 或略缩短 `timeToJumpApex`。
+- 如果角色缩小后跳得过高，优先调整 `jumpHeight`，保持 Phase01 与 Phase02 共用同一份 `LightweightMovement.asset`。
+- 如果动画读法影响判断落点，先降低视觉拉伸压缩幅度，再考虑改 Animator 状态。

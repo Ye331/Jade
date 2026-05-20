@@ -19,8 +19,8 @@
 
 ## 视觉流畅度验收
 
-1. 左右移动时，临时角色代理会自然翻转。
-2. 长跑时能看到身体前倾、飘带拖尾和速度感。
+1. 左右移动时，玩家视觉会自然翻转。
+2. 长跑时能看到身体前倾、跑动尘土和速度感。
 3. 起跳时身体略微拉长，下落时姿态收紧。
 4. 落地时有短暂压缩和少量尘土，但没有硬质镜头震动。
 5. 视觉表现不改变碰撞，玩家仍能稳定站上平台边缘。
@@ -31,6 +31,7 @@
 - `PlayerInputReader` 只负责读输入。
 - `PlayerMotor2D` 负责移动、跳跃、容错和重力。
 - `PlayerMovementSettings` 集中保存手感参数。
-- `PlayerVisualFeedback2D` 负责临时角色代理的朝向、拉伸、落地反馈和拖尾。
+- `PlayerAnimationDriver2D` 负责把移动状态送入 Animator。
+- `PlayerVisualFeedback2D` 负责视觉朝向、拉伸、落地反馈和尘土。
 - `SimpleCameraFollow2D` 负责平滑相机。
 - `RespawnZone2D` 负责掉落重置。

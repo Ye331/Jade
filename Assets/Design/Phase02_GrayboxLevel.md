@@ -2,6 +2,16 @@
 
 目标：把 Phase 01 的基础跑跳手感放进一段完整灰盒小关卡，验证关卡节奏，而不是继续只在单点测试场景里跑跳。
 
+## 当前实现落档
+
+- 测试场景：`Assets/Scenes/Prototype/Phase02_GrayboxLevel.scene`
+- 场景生成器：`PrototypeGrayboxLevelSceneBuilder`
+- 玩家优先使用：`Assets/Resources/Prefabs/Player/JadeSpiritPlayer.prefab`
+- 共用移动参数：`Assets/Scripts/Player/LightweightMovement.asset`
+- 远景背景：`Assets/Resources/Backgrounds/JadeMythForest_Background.png`
+- 交互对象：`Checkpoint2D`、`Collectible2D`、`LevelGoal2D`、`RespawnZone2D`
+- 当前目标是验证一段“起跑 -> 短跳 -> 分支收集 -> 检查点 -> 上升平台 -> 终点”的完整节奏。
+
 ## 场景
 
 打开 `Assets/Scenes/Prototype/Phase02_GrayboxLevel.scene`，进入 Play Mode。
@@ -40,6 +50,8 @@ Phase02 使用和 Phase01 相同的移动参数。角色缩小后，跳跃高度
 - `Collectible2D` 负责简单收集反馈。
 - `LevelGoal2D` 负责关卡完成反馈。
 - `PrototypeGrayboxLevelSceneBuilder` 在运行时生成路线，便于快速迭代关卡结构。
+- `JadeSpiritPlayer.prefab` 让 Phase01 和 Phase02 使用同一套角色、动画和碰撞设置；旧 `JadeQilinPlayer.prefab` 只作为回退。
+- `JadeMythForest_Background` 只是远景氛围层，不参与碰撞与路线判断。
 
 ## 当前不做
 
@@ -47,3 +59,10 @@ Phase02 使用和 Phase01 相同的移动参数。角色缩小后，跳跃高度
 - 敌人和战斗。
 - 正式美术和动画。
 - 地图 UI 和存档系统。
+
+## 下一轮关卡关注点
+
+- 继续保留灰盒优先，不要在路线稳定前投入正式场景美术。
+- 检查下层收集路线是否有明确动机：玩家应该能提前看到玉色收集物或路线提示。
+- 检查检查点位置是否足够靠近后半段失败点，避免重复跑前半段造成疲劳。
+- 如果 Phase02 后续加入能力门，建议只先加入一个能力和一条回访捷径，保持课程作业规模可控。

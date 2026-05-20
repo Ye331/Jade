@@ -29,6 +29,10 @@ namespace Jade.Player
         public bool LandedThisFrame => landedThisFrame;
         public bool JumpedThisFrame => jumpedThisFrame;
         public Vector2 Velocity => body != null ? body.velocity : Vector2.zero;
+        public float VerticalSpeed => body != null ? body.velocity.y : 0f;
+        public float Speed01 => settings != null && settings.maxRunSpeed > 0f
+            ? Mathf.Clamp01(Mathf.Abs(Velocity.x) / settings.maxRunSpeed)
+            : 0f;
 
         public void Configure(PlayerMovementSettings movementSettings)
         {
@@ -173,7 +177,8 @@ namespace Jade.Player
 
             if (Mathf.Abs(horizontal) > 0.01f)
             {
-                facingDirection = horizontal > 0f ? 1 : -1;
+                int requestedFacing = horizontal > 0f ? 1 : -1;
+                facingDirection = requestedFacing;
             }
 
             float targetSpeed = horizontal * settings.maxRunSpeed;

@@ -11,6 +11,8 @@ namespace Jade.World
 
         private static Sprite squareSprite;
         private static Sprite backgroundSprite;
+        private const string PlayerPrefabResourcePath = "Prefabs/Player/JadeSpiritPlayer";
+        private const string LegacyPlayerPrefabResourcePath = "Prefabs/Player/JadeQilinPlayer";
         private static readonly string[] CharacterFrameNames =
         {
             "Idle01",
@@ -43,8 +45,29 @@ namespace Jade.World
 
         private GameObject CreatePlayer(Sprite sprite)
         {
+            Vector3 spawn = new Vector3(-9f, -1.7f, 0f);
+            GameObject prefab = Resources.Load<GameObject>(PlayerPrefabResourcePath);
+            if (prefab == null)
+            {
+                prefab = Resources.Load<GameObject>(LegacyPlayerPrefabResourcePath);
+            }
+            if (prefab != null)
+            {
+                GameObject playerInstance = Instantiate(prefab, spawn, Quaternion.identity);
+                playerInstance.name = "Player_GrayboxRoute";
+
+                PlayerMotor2D prefabMotor = playerInstance.GetComponent<PlayerMotor2D>();
+                if (prefabMotor != null)
+                {
+                    prefabMotor.Configure(movementSettings);
+                    prefabMotor.SetSpawnPoint(spawn);
+                }
+
+                return playerInstance;
+            }
+
             GameObject player = new GameObject("Player_GrayboxRoute");
-            player.transform.position = new Vector3(-9f, -1.7f, 0f);
+            player.transform.position = spawn;
 
             Rigidbody2D body = player.AddComponent<Rigidbody2D>();
             body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -57,7 +80,7 @@ namespace Jade.World
             player.AddComponent<PlayerInputReader>();
             PlayerMotor2D motor = player.AddComponent<PlayerMotor2D>();
             motor.Configure(movementSettings);
-            motor.SetSpawnPoint(player.transform.position);
+            motor.SetSpawnPoint(spawn);
 
             CreatePlayerVisuals(player, sprite);
             return player;
@@ -206,7 +229,7 @@ namespace Jade.World
             if (characterRenderer != null)
             {
                 PlayerSpriteAnimator2D animator = player.AddComponent<PlayerSpriteAnimator2D>();
-                animator.Configure(characterRenderer, LoadCharacterFrameTextures(), 250f);
+                animator.Configure(characterRenderer, LoadCharacterFrameSprites());
             }
             else
             {
@@ -250,35 +273,45 @@ namespace Jade.World
 
         private static SpriteRenderer CreateAnimatedCharacterVisual(Transform visualRoot)
         {
-            Texture2D[] frameTextures = LoadCharacterFrameTextures();
-            if (frameTextures == null)
+            Sprite[] frameSprites = LoadCharacterFrameSprites();
+            if (frameSprites == null)
             {
                 return null;
             }
 
-            GameObject spriteObject = new GameObject("JadeQilin_FrameSprite");
+            GameObject spriteObject = new GameObject("JadeSpirit_FrameSprite");
             spriteObject.transform.SetParent(visualRoot);
             spriteObject.transform.localPosition = new Vector3(0f, -0.68f, 0f);
-            spriteObject.transform.localScale = Vector3.one;
+            spriteObject.transform.localScale = Vector3.one * GetSourceScaleCompensation(frameSprites[0]);
 
             SpriteRenderer renderer = spriteObject.AddComponent<SpriteRenderer>();
             renderer.sortingOrder = 16;
             return renderer;
         }
 
-        private static Texture2D[] LoadCharacterFrameTextures()
+        private static Sprite[] LoadCharacterFrameSprites()
         {
-            Texture2D[] textures = new Texture2D[CharacterFrameNames.Length];
+            Sprite[] sprites = new Sprite[CharacterFrameNames.Length];
             for (int i = 0; i < CharacterFrameNames.Length; i++)
             {
-                textures[i] = Resources.Load<Texture2D>("Characters/JadeQilinFrames/JadeQilin_" + CharacterFrameNames[i]);
-                if (textures[i] == null)
+                sprites[i] = Resources.Load<Sprite>("Characters/JadeQilinFrames/JadeQilin_" + CharacterFrameNames[i]);
+                if (sprites[i] == null)
                 {
                     return null;
                 }
             }
 
-            return textures;
+            return sprites;
+        }
+
+        private static float GetSourceScaleCompensation(Sprite sprite)
+        {
+            if (sprite == null || sprite.rect.height >= 1024f)
+            {
+                return 1f;
+            }
+
+            return 1024f / Mathf.Max(sprite.rect.height, 1f);
         }
 
         private static void CreateSpiritAnimalProxy(Sprite sprite, Transform visualRoot)

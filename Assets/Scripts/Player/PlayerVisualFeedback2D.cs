@@ -15,6 +15,7 @@ namespace Jade.Player
         [SerializeField] private float squashReturnSpeed = 12f;
         private PlayerMotor2D motor;
         private Vector3 targetScale = Vector3.one;
+        private Vector3 baseVisualScale = Vector3.one;
         private float targetTilt;
         private int visibleFacing = 1;
         private int previousFacing = 1;
@@ -42,6 +43,25 @@ namespace Jade.Player
             landingDust = landParticles;
             runDust = runParticles;
             speedTrail = trail;
+            CaptureBaseVisualScale();
+        }
+
+        private void Start()
+        {
+            CaptureBaseVisualScale();
+        }
+
+        private void CaptureBaseVisualScale()
+        {
+            if (visualRoot == null)
+            {
+                return;
+            }
+
+            baseVisualScale = new Vector3(
+                Mathf.Max(Mathf.Abs(visualRoot.localScale.x), 0.001f),
+                Mathf.Max(Mathf.Abs(visualRoot.localScale.y), 0.001f),
+                Mathf.Max(Mathf.Abs(visualRoot.localScale.z), 0.001f));
         }
 
         private void UpdateFacing()
@@ -68,12 +88,12 @@ namespace Jade.Player
             }
             else if (motor.JumpedThisFrame || velocity.y > 1.5f)
             {
-                targetScale = new Vector3(0.86f, 1.16f, 1f);
+                targetScale = Vector3.one;
                 targetTilt = -visibleFacing * runTiltDegrees * 0.35f;
             }
             else if (!motor.IsGrounded && velocity.y < -1f)
             {
-                targetScale = new Vector3(0.96f, 1.04f, 1f);
+                targetScale = Vector3.one;
                 targetTilt = visibleFacing * runTiltDegrees * 0.25f;
             }
             else
@@ -83,7 +103,10 @@ namespace Jade.Player
             }
 
             Vector3 currentScale = visualRoot.localScale;
-            Vector3 signedTargetScale = new Vector3(targetScale.x * visibleFacing, targetScale.y, targetScale.z);
+            Vector3 signedTargetScale = new Vector3(
+                baseVisualScale.x * targetScale.x * visibleFacing,
+                baseVisualScale.y * targetScale.y,
+                baseVisualScale.z * targetScale.z);
             visualRoot.localScale = Vector3.Lerp(currentScale, signedTargetScale, Time.deltaTime * squashReturnSpeed);
 
             Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetTilt);
