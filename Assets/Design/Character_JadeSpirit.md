@@ -1,37 +1,50 @@
-# Character: Jade Spirit
+# Character: JadeSpirit
 
-## 角色定位
+## 当前定位
 
-当前主角是中式童话风格的小型玉灵精灵。它保留玉、云气、麒麟角和发光灵核等神话意象，但不再作为旧四足灵兽处理，而是一个适合平台跳跃的轻盈角色。
+JadeSpirit 是当前玩家主角：小巧、灵动、偏中式童话的玉灵精灵，服务于平台跳跃中的快速移动、起跳和下落判断。它已经替代旧四足 JadeQilin，作为当前主角的唯一标准。
 
-## 视觉关键词
-
-- 小巧灵动，便于在平台之间穿梭。
-- 白玉面、发光大眼、短麒麟角、短云尾和胸口玉芯是主要识别点。
-- 服饰细节保持简化，避免小尺寸下糊成一团。
-- 当前游戏帧使用简化跑跳测试版，优先保证动作读法和落点判断。
+小尺寸下优先保证读图：白玉面、发光眼、短角或玉叶冠轮廓、短袍体块、清楚脚掌和短灵尾。服饰细节只保留大形状，不作为当前动画判断重点。
 
 ## 当前实现
 
-- 最终概念参考图：`Assets/Art/Concept/Characters/JadeSpirit_FinalConcept.png`
-- 简化跑跳测试参考图：`Assets/Art/Concept/Characters/JadeSpirit_SimplifiedRunJumpSheetReference.png`
-- 当前游戏动画帧：`Assets/Resources/Characters/JadeQilinFrames/`
-- 美术预览图：`Assets/Art/PrototypeArt/Characters/JadeQilinFrames_Preview.png`
+- 最终概念图：`Assets/Art/Concept/Characters/JadeSpirit_FinalConcept.png`
+- 简化跑跳参考图：`Assets/Art/Concept/Characters/JadeSpirit_SimplifiedRunJumpSheetReference.png`
+- 当前高分辨率帧目录：`Assets/Resources/Characters/JadeSpiritHighResFrames/`
 - 玩家 prefab：`Assets/Resources/Prefabs/Player/JadeSpiritPlayer.prefab`
 - Animator Controller：`Assets/Animation/Characters/JadeSpirit/JadeSpiritPlayer.controller`
 - 动画片段目录：`Assets/Animation/Characters/JadeSpirit/`
-- 规格文档：`Assets/Design/JadeSpirit_AnimationImportSpec.md`
-- 构建入口：Unity/Tuanjie 菜单 `Jade > Build Jade Spirit Player Assets`
+- 构建菜单：`Jade > Build Jade Spirit Player Assets`
 
-## 状态机
+## 当前状态机
 
-- 状态：`Idle`、`Run`、`JumpStart`、`JumpRise`、`JumpApex`、`Fall`、`Land`。
-- 参数：`Speed01`、`VerticalSpeed`、`Grounded`、`Jumped`、`Landed`。
-- `PlayerAnimationDriver2D` 继续负责把移动状态送入 Animator。
-- `PlayerVisualFeedback2D` 继续负责视觉朝向、拉伸压缩和尘土反馈。
+当前实际参与播放的状态：
 
-## 历史资源
+- `Idle`
+- `Run`
+- `JumpRise`
+- `JumpApex`
+- `Fall`
 
-- 旧四足角色参考图：`Assets/Resources/Characters/JadeQilin.png`
-- 旧四足角色剪影：`Assets/Resources/Characters/JadeQilin_Silhouette.png`
-- 旧 `JadeQilin` 动画链路暂时保留为历史归档和回退，不再作为当前主角标准。
+当前参数：
+
+- `Speed01`
+- `VerticalSpeed`
+- `Grounded`
+- `Jumped`
+- `Landed`
+
+`Jumped` 直接进入 `JumpRise`。`JumpRise`、`JumpApex`、`Fall` 由 `VerticalSpeed` 驱动切换。`Landed` 不播放落地动画，只根据 `Speed01` 立即回到 `Idle` 或 `Run`。
+
+## 保留资源
+
+`JumpStart`、`Land`、`Turn` 相关 PNG 或 anim 可以继续留在项目中，作为历史或备用美术资源，但它们不是当前可玩状态机的一部分，也不是当前必需状态。
+
+旧 `JadeQilin` 资源只作为迁移历史和兜底上下文保留，不再作为当前主角概念或动画标准。
+
+## 当前设计规则
+
+- 角色保持小巧、清楚、适合平台穿梭。
+- 空中阶段不再做运行时拉伸或压缩，避免跳跃轮廓变形。
+- 碰撞和移动仍由 `PlayerMotor2D` 与 `BoxCollider2D` 控制；视觉变化只发生在 `VisualRoot` 下。
+- 优先稳定 `Idle`、读得清的 `Run`、以及由物理驱动的 `JumpRise/JumpApex/Fall`，再考虑额外过渡动作。
