@@ -86,6 +86,11 @@ namespace Jade.Player
                 targetTilt = 0f;
                 PlayLandingFeedback();
             }
+            else if (motor.IsDashing)
+            {
+                targetScale = Vector3.one;
+                targetTilt = -visibleFacing * runTiltDegrees * 1.2f;
+            }
             else if (motor.JumpedThisFrame || velocity.y > 1.5f)
             {
                 targetScale = Vector3.one;
@@ -120,7 +125,7 @@ namespace Jade.Player
 
             if (speedTrail != null)
             {
-                speedTrail.emitting = Mathf.Abs(velocity.x) > fastSpeedThreshold || Mathf.Abs(velocity.y) > 6f;
+                speedTrail.emitting = motor.IsDashing || Mathf.Abs(velocity.x) > fastSpeedThreshold || Mathf.Abs(velocity.y) > 6f;
             }
 
             if (runDust == null)

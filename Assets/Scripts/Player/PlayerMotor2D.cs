@@ -5,6 +5,7 @@ namespace Jade.Player
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(PlayerInputReader))]
+    [RequireComponent(typeof(PlayerAbilityInventory2D))]
     public class PlayerMotor2D : MonoBehaviour
     {
         [SerializeField] private PlayerMovementSettings settings;
@@ -12,22 +13,31 @@ namespace Jade.Player
         private Rigidbody2D body;
         private Collider2D bodyCollider;
         private PlayerInputReader input;
+        private PlayerAbilityInventory2D abilities;
         private Vector3 spawnPosition;
 
         private float coyoteCounter;
         private float jumpBufferCounter;
+        private float dashTimer;
+        private float dashCooldownCounter;
         private float gravity;
         private float jumpVelocity;
         private bool isGrounded;
         private bool wasGrounded;
         private bool landedThisFrame;
         private bool jumpedThisFrame;
+        private bool dashedThisFrame;
+        private bool isDashing;
+        private int airDashesRemaining;
         private int facingDirection = 1;
+        private int dashDirection = 1;
 
         public int FacingDirection => facingDirection;
         public bool IsGrounded => isGrounded;
         public bool LandedThisFrame => landedThisFrame;
         public bool JumpedThisFrame => jumpedThisFrame;
+        public bool DashedThisFrame => dashedThisFrame;
+        public bool IsDashing => isDashing;
         public Vector2 Velocity => body != null ? body.velocity : Vector2.zero;
         public float VerticalSpeed => body != null ? body.velocity.y : 0f;
         public float Speed01 => settings != null && settings.maxRunSpeed > 0f
@@ -45,11 +55,17 @@ namespace Jade.Player
             body = GetComponent<Rigidbody2D>();
             bodyCollider = GetComponent<Collider2D>();
             input = GetComponent<PlayerInputReader>();
+            abilities = GetComponent<PlayerAbilityInventory2D>();
+            if (abilities == null)
+            {
+                abilities = gameObject.AddComponent<PlayerAbilityInventory2D>();
+            }
             spawnPosition = transform.position;
 
             body.gravityScale = 0f;
             body.freezeRotation = true;
             RecalculateJumpValues();
+            ResetAirDashCount();
         }
 
         private void OnValidate()
@@ -66,10 +82,18 @@ namespace Jade.Player
 
             landedThisFrame = false;
             jumpedThisFrame = false;
+            dashedThisFrame = false;
             wasGrounded = isGrounded;
 
             UpdateGroundedState();
             UpdateTimers();
+            TryStartDash();
+            if (isDashing)
+            {
+                HandleDash();
+                return;
+            }
+
             HandleJumpInput();
             HandleRun();
             HandleGravity();
@@ -79,6 +103,9 @@ namespace Jade.Player
         {
             body.velocity = Vector2.zero;
             transform.position = spawnPosition;
+            isDashing = false;
+            dashTimer = 0f;
+            ResetAirDashCount();
         }
 
         public void SetSpawnPoint(Vector3 position)
@@ -126,6 +153,7 @@ namespace Jade.Player
             if (isGrounded)
             {
                 coyoteCounter = settings.coyoteTime;
+                ResetAirDashCount();
             }
         }
 
@@ -143,10 +171,56 @@ namespace Jade.Player
                 jumpBufferCounter -= step;
             }
 
+            if (dashCooldownCounter > 0f)
+            {
+                dashCooldownCounter -= step;
+            }
+
             if (input.ConsumeJumpPressed())
             {
                 jumpBufferCounter = settings.jumpBufferTime;
             }
+        }
+
+        private void TryStartDash()
+        {
+            if (!input.ConsumeDashPressed())
+            {
+                return;
+            }
+
+            if (abilities == null || !abilities.DashUnlocked || isGrounded || isDashing || airDashesRemaining <= 0 || dashCooldownCounter > 0f)
+            {
+                return;
+            }
+
+            float horizontal = input.Horizontal;
+            dashDirection = Mathf.Abs(horizontal) > 0.01f ? (horizontal > 0f ? 1 : -1) : facingDirection;
+            facingDirection = dashDirection;
+            airDashesRemaining--;
+            dashTimer = Mathf.Max(settings.dashDuration, Time.fixedDeltaTime);
+            dashCooldownCounter = settings.dashCooldown;
+            isDashing = true;
+            dashedThisFrame = true;
+            jumpBufferCounter = 0f;
+
+            body.velocity = new Vector2(dashDirection * settings.dashSpeed, settings.dashVerticalSpeed);
+        }
+
+        private void HandleDash()
+        {
+            dashTimer -= Time.fixedDeltaTime;
+            body.velocity = new Vector2(dashDirection * settings.dashSpeed, settings.dashVerticalSpeed);
+
+            if (dashTimer <= 0f || isGrounded)
+            {
+                isDashing = false;
+            }
+        }
+
+        private void ResetAirDashCount()
+        {
+            airDashesRemaining = settings != null ? Mathf.Max(0, settings.airDashCount) : 0;
         }
 
         private void HandleJumpInput()

@@ -11,6 +11,7 @@ namespace Jade.Player
         public const string GroundedParameter = "Grounded";
         public const string JumpedParameter = "Jumped";
         public const string LandedParameter = "Landed";
+        public const string DashingParameter = "Dashing";
 
         [SerializeField] private Animator animator;
         [SerializeField] private float runAnimationMinSpeed = 0.85f;
@@ -21,6 +22,7 @@ namespace Jade.Player
         private static readonly int GroundedHash = Animator.StringToHash(GroundedParameter);
         private static readonly int JumpedHash = Animator.StringToHash(JumpedParameter);
         private static readonly int LandedHash = Animator.StringToHash(LandedParameter);
+        private static readonly int DashingHash = Animator.StringToHash(DashingParameter);
         private static readonly int RunStateHash = Animator.StringToHash("Run");
 
         private PlayerMotor2D motor;
@@ -44,6 +46,7 @@ namespace Jade.Player
             animator.SetFloat(Speed01Hash, motor.Speed01);
             animator.SetFloat(VerticalSpeedHash, motor.VerticalSpeed);
             animator.SetBool(GroundedHash, motor.IsGrounded);
+            animator.SetBool(DashingHash, motor.IsDashing);
 
             if (motor.JumpedThisFrame)
             {

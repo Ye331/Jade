@@ -20,6 +20,7 @@
 - `JadeSpirit_JumpRise_01` 到 `JadeSpirit_JumpRise_03`
 - `JadeSpirit_JumpApex_01` 到 `JadeSpirit_JumpApex_02`
 - `JadeSpirit_Fall_01` 到 `JadeSpirit_Fall_03`
+- `JadeSpirit_Dash_01` 到 `JadeSpirit_Dash_04`
 
 `JumpStart`、`Land`、`Turn` 帧可以继续作为历史或备用资源留在项目里，但它们不是当前 active controller 的必需帧，也不是当前基础状态。
 
@@ -48,6 +49,7 @@
 - `Run` 使用 8 帧循环。
 - `Jumped` 直接进入 `JumpRise`。
 - `JumpRise`、`JumpApex`、`Fall` 根据垂直速度切换。
+- `Dash` 使用 4 帧非循环动画，按 16fps 播放以匹配当前更长的 0.26 秒冲刺时长，由 `Dashing` 参数进入，结束后按垂直速度回到 `JumpRise/JumpApex/Fall`。
 - `Landed` 立即回到 `Idle` 或 `Run`，不播放落地动画。
 - 空中视觉反馈不拉伸角色轮廓。
 

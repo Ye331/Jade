@@ -25,6 +25,7 @@ JadeSpirit 是当前玩家主角：小巧、灵动、偏中式童话的玉灵精
 - `JumpRise`
 - `JumpApex`
 - `Fall`
+- `Dash`
 
 当前参数：
 
@@ -33,8 +34,10 @@ JadeSpirit 是当前玩家主角：小巧、灵动、偏中式童话的玉灵精
 - `Grounded`
 - `Jumped`
 - `Landed`
+- `Dashing`
 
 `Jumped` 直接进入 `JumpRise`。`JumpRise`、`JumpApex`、`Fall` 由 `VerticalSpeed` 驱动切换。`Landed` 不播放落地动画，只根据 `Speed01` 立即回到 `Idle` 或 `Run`。
+`Dash` 由 `Dashing` 参数进入，使用 4 帧玉灵飞掠动作；冲刺结束后按 `VerticalSpeed` 回到 `JumpRise`、`JumpApex` 或 `Fall`。
 
 ## 保留资源
 

@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Prototype/Phase03_AnimationTestPlatform.scene
     guid: a59dd122f9104f1fae9c82b818620aa6
+  - enabled: 1
+    path: Assets/Scenes/Prototype/Phase04_FirstPlayableLevel.scene
+    guid: b743b1623c1d4d2c8ae984d9da351495
   m_configObjects: {}

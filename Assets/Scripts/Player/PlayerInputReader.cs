@@ -6,14 +6,17 @@ namespace Jade.Player
     {
         public float Horizontal { get; private set; }
         public bool JumpHeld { get; private set; }
+        public bool DashHeld { get; private set; }
 
         private bool jumpPressedThisFrame;
         private bool jumpReleasedThisFrame;
+        private bool dashPressedThisFrame;
 
         private void Update()
         {
             Horizontal = Input.GetAxisRaw("Horizontal");
             JumpHeld = Input.GetButton("Jump");
+            DashHeld = Input.GetButton("Fire3");
 
             if (Input.GetButtonDown("Jump"))
             {
@@ -23,6 +26,11 @@ namespace Jade.Player
             if (Input.GetButtonUp("Jump"))
             {
                 jumpReleasedThisFrame = true;
+            }
+
+            if (Input.GetButtonDown("Fire3"))
+            {
+                dashPressedThisFrame = true;
             }
         }
 
@@ -45,6 +53,17 @@ namespace Jade.Player
             }
 
             jumpReleasedThisFrame = false;
+            return true;
+        }
+
+        public bool ConsumeDashPressed()
+        {
+            if (!dashPressedThisFrame)
+            {
+                return false;
+            }
+
+            dashPressedThisFrame = false;
             return true;
         }
     }

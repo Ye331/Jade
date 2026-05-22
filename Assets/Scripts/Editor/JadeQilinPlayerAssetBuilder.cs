@@ -119,7 +119,8 @@ namespace Jade.EditorTools
                 new ClipSpec("Run", Range("JadeSpirit_Run", 8), new[] { "JadeQilin_Run01", "JadeQilin_Run02", "JadeQilin_Run03", "JadeQilin_Run04" }, 10f, true),
                 new ClipSpec("JumpRise", Range("JadeSpirit_JumpRise", 3), new[] { "JadeQilin_Jump", "JadeQilin_Jump", "JadeQilin_Jump" }, 10f, true),
                 new ClipSpec("JumpApex", Range("JadeSpirit_JumpApex", 2), new[] { "JadeQilin_Jump", "JadeQilin_Fall" }, 8f, true),
-                new ClipSpec("Fall", Range("JadeSpirit_Fall", 3), new[] { "JadeQilin_Fall", "JadeQilin_Fall", "JadeQilin_Fall" }, 10f, true)
+                new ClipSpec("Fall", Range("JadeSpirit_Fall", 3), new[] { "JadeQilin_Fall", "JadeQilin_Fall", "JadeQilin_Fall" }, 10f, true),
+                new ClipSpec("Dash", Range("JadeSpirit_Dash", 4), new[] { "JadeSpirit_JumpRise_01", "JadeSpirit_Fall_01" }, 16f, false)
             };
 
             Dictionary<string, AnimationClip> clips = new Dictionary<string, AnimationClip>();
@@ -277,6 +278,7 @@ namespace Jade.EditorTools
             controller.AddParameter(PlayerAnimationDriver2D.GroundedParameter, AnimatorControllerParameterType.Bool);
             controller.AddParameter(PlayerAnimationDriver2D.JumpedParameter, AnimatorControllerParameterType.Trigger);
             controller.AddParameter(PlayerAnimationDriver2D.LandedParameter, AnimatorControllerParameterType.Trigger);
+            controller.AddParameter(PlayerAnimationDriver2D.DashingParameter, AnimatorControllerParameterType.Bool);
 
             AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
             AnimatorState idle = AddState(stateMachine, "Idle", clips, 250, 0);
@@ -284,6 +286,7 @@ namespace Jade.EditorTools
             AnimatorState jumpRise = AddState(stateMachine, "JumpRise", clips, 510, -180);
             AnimatorState jumpApex = AddState(stateMachine, "JumpApex", clips, 770, -180);
             AnimatorState fall = AddState(stateMachine, "Fall", clips, 1030, -180);
+            AnimatorState dash = AddState(stateMachine, "Dash", clips, 770, -360);
             stateMachine.defaultState = idle;
 
             AddGroundedSpeedTransition(idle, run, AnimatorConditionMode.Greater, 0.1f, false, 0f);
@@ -293,6 +296,9 @@ namespace Jade.EditorTools
 
             AnimatorStateTransition anyJump = AddAnyTransition(stateMachine, jumpRise, 0.03f);
             anyJump.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver2D.JumpedParameter);
+
+            AnimatorStateTransition anyDash = AddAnyTransition(stateMachine, dash, 0.04f);
+            anyDash.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver2D.DashingParameter);
 
             AnimatorStateTransition landedToRun = AddAnyTransition(stateMachine, run, 0.03f);
             landedToRun.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver2D.LandedParameter);
@@ -310,6 +316,19 @@ namespace Jade.EditorTools
 
             AnimatorStateTransition apexToFall = AddTransition(jumpApex, fall, 0.04f);
             apexToFall.AddCondition(AnimatorConditionMode.Less, -0.1f, PlayerAnimationDriver2D.VerticalSpeedParameter);
+
+            AnimatorStateTransition dashToRise = AddTransition(dash, jumpRise, 0.05f);
+            dashToRise.AddCondition(AnimatorConditionMode.IfNot, 0f, PlayerAnimationDriver2D.DashingParameter);
+            dashToRise.AddCondition(AnimatorConditionMode.Greater, 0.65f, PlayerAnimationDriver2D.VerticalSpeedParameter);
+
+            AnimatorStateTransition dashToApex = AddTransition(dash, jumpApex, 0.05f);
+            dashToApex.AddCondition(AnimatorConditionMode.IfNot, 0f, PlayerAnimationDriver2D.DashingParameter);
+            dashToApex.AddCondition(AnimatorConditionMode.Less, 0.65f, PlayerAnimationDriver2D.VerticalSpeedParameter);
+            dashToApex.AddCondition(AnimatorConditionMode.Greater, -0.1f, PlayerAnimationDriver2D.VerticalSpeedParameter);
+
+            AnimatorStateTransition dashToFall = AddTransition(dash, fall, 0.05f);
+            dashToFall.AddCondition(AnimatorConditionMode.IfNot, 0f, PlayerAnimationDriver2D.DashingParameter);
+            dashToFall.AddCondition(AnimatorConditionMode.Less, -0.1f, PlayerAnimationDriver2D.VerticalSpeedParameter);
 
             return controller;
         }
@@ -385,6 +404,7 @@ namespace Jade.EditorTools
             collider.size = new Vector2(0.68f, 1.25f);
 
             root.AddComponent<PlayerInputReader>();
+            root.AddComponent<PlayerAbilityInventory2D>();
             PlayerMotor2D motor = root.AddComponent<PlayerMotor2D>();
             PlayerMovementSettings movementSettings = AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>(MovementSettingsPath);
             if (movementSettings != null)

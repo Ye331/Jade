@@ -9830,6 +9830,7 @@ GameObject:
   - component: {fileID: 3948323638356617661}
   - component: {fileID: 6420105003459902403}
   - component: {fileID: 3121997721720561525}
+  - component: {fileID: 7501284963013379219}
   - component: {fileID: 1686587295843137145}
   - component: {fileID: 2021548883759959868}
   - component: {fileID: 6982583027331282271}
@@ -9953,9 +9954,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 287f3a10317a4c6aac3f3e115539934f, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  settings: {fileID: 11400000, guid: 2b4503282e4e40488a1fe41eb4bbf774, type: 2}
+--- !u!114 &7501284963013379219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6277569740454333896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e69f2b5c62a24c15a90d25524be2d341, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  settings: {fileID: 11400000, guid: 2b4503282e4e40488a1fe41eb4bbf774, type: 2}
+  dashUnlocked: 0
 --- !u!95 &1686587295843137145
 Animator:
   serializedVersion: 6

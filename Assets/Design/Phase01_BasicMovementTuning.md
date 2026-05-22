@@ -22,13 +22,13 @@
 - `airAcceleration = 45`：空中方向控制力度。
 - `airDeceleration = 30`：空中松开方向键后的减速力度。
 - `jumpHeight = 3.35`：长按跳跃时的大致跳跃高度。
-- `timeToJumpApex = 0.39`：到达跳跃最高点所需时间，越小越利落。
-- `coyoteTime = 0.10`：离开平台后仍允许跳跃的时间。
+- `timeToJumpApex = 0.46`：到达跳跃最高点所需时间，当前略加长以增强滞空读图。
+- `coyoteTime = 0.08`：离开平台后仍允许跳跃的时间，这才是通常说的“土狼时间”。
 - `jumpBufferTime = 0.12`：落地前提前按跳的缓存时间。
 - `jumpCutVelocityMultiplier = 0.45`：松开跳跃键时保留的上升速度比例。
-- `fallGravityMultiplier = 1.85`：下落时重力倍率。
-- `lowJumpGravityMultiplier = 2.35`：松开跳跃键后的上升重力倍率。
-- `maxFallSpeed = 16.5`：最大下落速度。
+- `fallGravityMultiplier = 1.55`：下落时重力倍率，当前略降低以延长空中停留。
+- `lowJumpGravityMultiplier = 2.05`：松开跳跃键后的上升重力倍率。
+- `maxFallSpeed = 15`：最大下落速度。
 
 ## 推荐调参顺序
 
