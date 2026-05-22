@@ -10,6 +10,7 @@ namespace Jade.Player
         public const string VerticalSpeedParameter = "VerticalSpeed";
         public const string GroundedParameter = "Grounded";
         public const string JumpedParameter = "Jumped";
+        public const string DoubleJumpedParameter = "DoubleJumped";
         public const string LandedParameter = "Landed";
         public const string DashingParameter = "Dashing";
 
@@ -21,11 +22,19 @@ namespace Jade.Player
         private static readonly int VerticalSpeedHash = Animator.StringToHash(VerticalSpeedParameter);
         private static readonly int GroundedHash = Animator.StringToHash(GroundedParameter);
         private static readonly int JumpedHash = Animator.StringToHash(JumpedParameter);
+        private static readonly int DoubleJumpedHash = Animator.StringToHash(DoubleJumpedParameter);
         private static readonly int LandedHash = Animator.StringToHash(LandedParameter);
         private static readonly int DashingHash = Animator.StringToHash(DashingParameter);
         private static readonly int RunStateHash = Animator.StringToHash("Run");
 
         private PlayerMotor2D motor;
+        private bool hasSpeed01Parameter;
+        private bool hasVerticalSpeedParameter;
+        private bool hasGroundedParameter;
+        private bool hasJumpedParameter;
+        private bool hasDoubleJumpedParameter;
+        private bool hasLandedParameter;
+        private bool hasDashingParameter;
 
         private void Awake()
         {
@@ -34,6 +43,8 @@ namespace Jade.Player
             {
                 animator = GetComponent<Animator>();
             }
+
+            CacheAnimatorParameters();
         }
 
         private void Update()
@@ -43,22 +54,75 @@ namespace Jade.Player
                 return;
             }
 
-            animator.SetFloat(Speed01Hash, motor.Speed01);
-            animator.SetFloat(VerticalSpeedHash, motor.VerticalSpeed);
-            animator.SetBool(GroundedHash, motor.IsGrounded);
-            animator.SetBool(DashingHash, motor.IsDashing);
+            CacheAnimatorParameters();
 
-            if (motor.JumpedThisFrame)
+            SetFloatIfPresent(Speed01Hash, hasSpeed01Parameter, motor.Speed01);
+            SetFloatIfPresent(VerticalSpeedHash, hasVerticalSpeedParameter, motor.VerticalSpeed);
+            SetBoolIfPresent(GroundedHash, hasGroundedParameter, motor.IsGrounded);
+            SetBoolIfPresent(DashingHash, hasDashingParameter, motor.IsDashing);
+
+            if (motor.JumpedThisFrame && hasJumpedParameter)
             {
                 animator.SetTrigger(JumpedHash);
             }
 
-            if (motor.LandedThisFrame)
+            if (motor.DoubleJumpedThisFrame && hasDoubleJumpedParameter && motor.ConsumeDoubleJumpedThisFrame())
+            {
+                animator.SetTrigger(DoubleJumpedHash);
+            }
+
+            if (motor.LandedThisFrame && hasLandedParameter)
             {
                 animator.SetTrigger(LandedHash);
             }
 
             UpdateRunPlaybackSpeed();
+        }
+
+        private void CacheAnimatorParameters()
+        {
+            if (animator == null)
+            {
+                return;
+            }
+
+            hasSpeed01Parameter = HasParameter(Speed01Hash);
+            hasVerticalSpeedParameter = HasParameter(VerticalSpeedHash);
+            hasGroundedParameter = HasParameter(GroundedHash);
+            hasJumpedParameter = HasParameter(JumpedHash);
+            hasDoubleJumpedParameter = HasParameter(DoubleJumpedHash);
+            hasLandedParameter = HasParameter(LandedHash);
+            hasDashingParameter = HasParameter(DashingHash);
+        }
+
+        private bool HasParameter(int hash)
+        {
+            AnimatorControllerParameter[] parameters = animator.parameters;
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (parameters[i].nameHash == hash)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void SetFloatIfPresent(int hash, bool present, float value)
+        {
+            if (present)
+            {
+                animator.SetFloat(hash, value);
+            }
+        }
+
+        private void SetBoolIfPresent(int hash, bool present, bool value)
+        {
+            if (present)
+            {
+                animator.SetBool(hash, value);
+            }
         }
 
         private void UpdateRunPlaybackSpeed()

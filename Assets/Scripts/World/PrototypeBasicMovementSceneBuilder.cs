@@ -75,6 +75,7 @@ namespace Jade.World
             collider.size = new Vector2(0.68f, 1.25f);
 
             player.AddComponent<PlayerInputReader>();
+            player.AddComponent<PlayerAbilityInventory2D>();
             PlayerMotor2D motor = player.AddComponent<PlayerMotor2D>();
             motor.Configure(movementSettings);
             motor.SetSpawnPoint(spawn);

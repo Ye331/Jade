@@ -27,6 +27,7 @@ namespace Jade.World
             CreateBackground(cameraToUse);
             CreateRoute(sprite);
             CreateDashAbilityPickup(sprite, new Vector2(2.5f, -2.25f));
+            CreateDoubleJumpAbilityPickup(sprite, new Vector2(31f, -0.45f));
             CreateCheckpoint(sprite, "Checkpoint_FirstShrine", new Vector2(46f, -0.75f));
             CreateCollectibles(sprite);
             CreateGoal(sprite, new Vector2(88f, 3f));
@@ -73,6 +74,7 @@ namespace Jade.World
             collider.size = new Vector2(0.68f, 1.25f);
 
             player.AddComponent<PlayerInputReader>();
+            player.AddComponent<PlayerAbilityInventory2D>();
             PlayerMotor2D fallbackMotor = player.AddComponent<PlayerMotor2D>();
             if (movementSettings != null)
             {
@@ -124,8 +126,10 @@ namespace Jade.World
             CreateBox(sprite, "ShortJump_01", new Vector2(21f, -1.95f), new Vector2(2.6f, 0.45f), PlatformColor(RouteBand.Jump));
             CreateBox(sprite, "ShortJump_02", new Vector2(26f, -1.45f), new Vector2(2.35f, 0.45f), PlatformColor(RouteBand.Jump));
             CreateBox(sprite, "ShortJump_03", new Vector2(31f, -1.15f), new Vector2(2.5f, 0.45f), PlatformColor(RouteBand.Jump));
+            CreateBox(sprite, "DoubleJump_TutorialLanding", new Vector2(38.2f, 0.9f), new Vector2(3.2f, 0.45f), PlatformColor(RouteBand.Ability));
+            CreateBox(sprite, "DoubleJump_ReturnToMain", new Vector2(42.8f, -1.25f), new Vector2(2.5f, 0.45f), PlatformColor(RouteBand.Ability));
 
-            CreateBox(sprite, "BranchChoice_Main", new Vector2(38f, -1.25f), new Vector2(5f, 0.55f), PlatformColor(RouteBand.Main));
+            CreateBox(sprite, "BranchChoice_Main", new Vector2(46f, -1.25f), new Vector2(5f, 0.55f), PlatformColor(RouteBand.Main));
             CreateBox(sprite, "LowerBranch_DropCatch", new Vector2(36f, -5.15f), new Vector2(4.2f, 0.45f), PlatformColor(RouteBand.Optional));
             CreateBox(sprite, "LowerBranch_JadeRun", new Vector2(43f, -5.15f), new Vector2(6f, 0.45f), PlatformColor(RouteBand.Optional));
             CreateBox(sprite, "LowerBranch_ReturnStep_01", new Vector2(50f, -4.05f), new Vector2(2.4f, 0.45f), PlatformColor(RouteBand.Optional));
@@ -204,6 +208,25 @@ namespace Jade.World
             pickup.transform.localScale = new Vector3(0.42f, 0.42f, 1f);
 
             DashAbilityPickup2D pickupComponent = pickup.AddComponent<DashAbilityPickup2D>();
+            pickupComponent.Configure(visual);
+        }
+
+        private void CreateDoubleJumpAbilityPickup(Sprite sprite, Vector2 position)
+        {
+            GameObject pickup = new GameObject("AbilityPickup_DoubleJump");
+            pickup.transform.position = position;
+
+            CircleCollider2D trigger = pickup.AddComponent<CircleCollider2D>();
+            trigger.radius = 0.45f;
+            trigger.isTrigger = true;
+
+            SpriteRenderer visual = pickup.AddComponent<SpriteRenderer>();
+            visual.sprite = sprite;
+            visual.color = new Color(0.72f, 0.95f, 1f, 1f);
+            visual.sortingOrder = 18;
+            pickup.transform.localScale = new Vector3(0.42f, 0.42f, 1f);
+
+            DoubleJumpAbilityPickup2D pickupComponent = pickup.AddComponent<DoubleJumpAbilityPickup2D>();
             pickupComponent.Configure(visual);
         }
 

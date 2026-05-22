@@ -19,6 +19,8 @@ namespace Jade.Player
         public float coyoteTime = 0.08f;
         public float jumpBufferTime = 0.12f;
         [Range(0.1f, 1f)] public float jumpCutVelocityMultiplier = 0.45f;
+        public int airJumpCount = 1;
+        [Range(0.1f, 1.2f)] public float doubleJumpVelocityMultiplier = 0.88f;
 
         [Header("Gravity")]
         public float fallGravityMultiplier = 1.55f;

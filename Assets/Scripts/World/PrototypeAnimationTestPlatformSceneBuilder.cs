@@ -67,6 +67,7 @@ namespace Jade.World
             collider.size = new Vector2(0.68f, 1.25f);
 
             player.AddComponent<PlayerInputReader>();
+            player.AddComponent<PlayerAbilityInventory2D>();
             PlayerMotor2D fallbackMotor = player.AddComponent<PlayerMotor2D>();
             if (movementSettings != null)
             {

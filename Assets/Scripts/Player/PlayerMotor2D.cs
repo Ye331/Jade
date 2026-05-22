@@ -26,8 +26,10 @@ namespace Jade.Player
         private bool wasGrounded;
         private bool landedThisFrame;
         private bool jumpedThisFrame;
+        private bool doubleJumpedThisFrame;
         private bool dashedThisFrame;
         private bool isDashing;
+        private int airJumpsRemaining;
         private int airDashesRemaining;
         private int facingDirection = 1;
         private int dashDirection = 1;
@@ -36,6 +38,7 @@ namespace Jade.Player
         public bool IsGrounded => isGrounded;
         public bool LandedThisFrame => landedThisFrame;
         public bool JumpedThisFrame => jumpedThisFrame;
+        public bool DoubleJumpedThisFrame => doubleJumpedThisFrame;
         public bool DashedThisFrame => dashedThisFrame;
         public bool IsDashing => isDashing;
         public Vector2 Velocity => body != null ? body.velocity : Vector2.zero;
@@ -65,6 +68,7 @@ namespace Jade.Player
             body.gravityScale = 0f;
             body.freezeRotation = true;
             RecalculateJumpValues();
+            ResetAirJumpCount();
             ResetAirDashCount();
         }
 
@@ -105,12 +109,24 @@ namespace Jade.Player
             transform.position = spawnPosition;
             isDashing = false;
             dashTimer = 0f;
+            ResetAirJumpCount();
             ResetAirDashCount();
         }
 
         public void SetSpawnPoint(Vector3 position)
         {
             spawnPosition = position;
+        }
+
+        public bool ConsumeDoubleJumpedThisFrame()
+        {
+            if (!doubleJumpedThisFrame)
+            {
+                return false;
+            }
+
+            doubleJumpedThisFrame = false;
+            return true;
         }
 
         private void RecalculateJumpValues()
@@ -153,6 +169,7 @@ namespace Jade.Player
             if (isGrounded)
             {
                 coyoteCounter = settings.coyoteTime;
+                ResetAirJumpCount();
                 ResetAirDashCount();
             }
         }
@@ -223,6 +240,11 @@ namespace Jade.Player
             airDashesRemaining = settings != null ? Mathf.Max(0, settings.airDashCount) : 0;
         }
 
+        private void ResetAirJumpCount()
+        {
+            airJumpsRemaining = settings != null ? Mathf.Max(0, settings.airJumpCount) : 0;
+        }
+
         private void HandleJumpInput()
         {
             if (jumpBufferCounter > 0f && coyoteCounter > 0f)
@@ -235,6 +257,20 @@ namespace Jade.Player
                 coyoteCounter = 0f;
                 isGrounded = false;
                 jumpedThisFrame = true;
+                return;
+            }
+
+            if (jumpBufferCounter > 0f && CanDoubleJump())
+            {
+                Vector2 velocity = body.velocity;
+                velocity.y = jumpVelocity * settings.doubleJumpVelocityMultiplier;
+                body.velocity = velocity;
+
+                airJumpsRemaining--;
+                jumpBufferCounter = 0f;
+                coyoteCounter = 0f;
+                isGrounded = false;
+                doubleJumpedThisFrame = true;
             }
 
             if (input.ConsumeJumpReleased() && body.velocity.y > 0f)
@@ -243,6 +279,15 @@ namespace Jade.Player
                 velocity.y *= settings.jumpCutVelocityMultiplier;
                 body.velocity = velocity;
             }
+        }
+
+        private bool CanDoubleJump()
+        {
+            return abilities != null
+                && abilities.DoubleJumpUnlocked
+                && !isGrounded
+                && coyoteCounter <= 0f
+                && airJumpsRemaining > 0;
         }
 
         private void HandleRun()

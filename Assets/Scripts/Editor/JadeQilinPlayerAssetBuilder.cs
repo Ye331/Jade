@@ -30,16 +30,37 @@ namespace Jade.EditorTools
         public static void BuildAll()
         {
             EnsureFolders();
-            ApplyImportSettingsForExistingFrames();
-            AssetDatabase.Refresh();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ApplyImportSettingsForDoubleJumpFrames();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
-            Dictionary<string, AnimationClip> clips = CreateAnimationClips();
-            AnimatorController controller = CreateAnimatorController(clips);
-            CreatePlayerPrefab(controller);
+            EnsureDoubleJumpAnimationClip();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("Built Jade Spirit player prefab, animator controller, and animation clips.");
+            Debug.Log("Updated Jade Spirit additive animation assets without rebuilding the controller or prefab.");
+        }
+
+        [MenuItem("Jade/Add Jade Spirit Double Jump State")]
+        public static void AddDoubleJumpState()
+        {
+            EnsureFolders();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            ApplyImportSettingsForDoubleJumpFrames();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+            AnimationClip doubleJumpClip = EnsureDoubleJumpAnimationClip();
+            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+            if (controller == null)
+            {
+                throw new FileNotFoundException("Cannot add Jade Spirit double jump state because the animator controller is missing.", ControllerPath);
+            }
+
+            EnsureDoubleJumpAnimatorState(controller, doubleJumpClip);
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log("Added Jade Spirit double jump state without rebuilding existing states or prefab.");
         }
 
         public static void ApplyCharacterTextureSettings(TextureImporter importer)
@@ -120,6 +141,7 @@ namespace Jade.EditorTools
                 new ClipSpec("JumpRise", Range("JadeSpirit_JumpRise", 3), new[] { "JadeQilin_Jump", "JadeQilin_Jump", "JadeQilin_Jump" }, 10f, true),
                 new ClipSpec("JumpApex", Range("JadeSpirit_JumpApex", 2), new[] { "JadeQilin_Jump", "JadeQilin_Fall" }, 8f, true),
                 new ClipSpec("Fall", Range("JadeSpirit_Fall", 3), new[] { "JadeQilin_Fall", "JadeQilin_Fall", "JadeQilin_Fall" }, 10f, true),
+                new ClipSpec("DoubleJump", Range("JadeSpirit_DoubleJump", 4), new string[0], 18f, false),
                 new ClipSpec("Dash", Range("JadeSpirit_Dash", 4), new[] { "JadeSpirit_JumpRise_01", "JadeSpirit_Fall_01" }, 16f, false)
             };
 
@@ -133,6 +155,39 @@ namespace Jade.EditorTools
             }
 
             return clips;
+        }
+
+        private static void ApplyImportSettingsForDoubleJumpFrames()
+        {
+            for (int i = 1; i <= 4; i++)
+            {
+                string path = HighResFrameFolder + "/JadeSpirit_DoubleJump_" + i.ToString("00") + ".png";
+                string absolutePath = Path.GetFullPath(path);
+                if (!File.Exists(absolutePath))
+                {
+                    throw new FileNotFoundException("Required Jade Spirit double jump texture is missing on disk: " + absolutePath);
+                }
+
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
+                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+                TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (importer == null)
+                {
+                    throw new FileNotFoundException("Required Jade Spirit double jump texture exists on disk but was not found by the AssetDatabase. Reimport this file in Tuanjie and rerun the builder: " + path);
+                }
+
+                ApplyCharacterTextureSettings(importer);
+                importer.SaveAndReimport();
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
+            }
+        }
+
+        private static AnimationClip EnsureDoubleJumpAnimationClip()
+        {
+            ClipSpec spec = new ClipSpec("DoubleJump", Range("JadeSpirit_DoubleJump", 4), new string[0], 18f, false);
+            Sprite[] frames = LoadRequiredFrames(spec);
+            return CreateClip(spec, frames);
         }
 
         private static string[] Range(string prefix, int count)
@@ -173,6 +228,23 @@ namespace Jade.EditorTools
             return frames;
         }
 
+        private static Sprite[] LoadRequiredFrames(ClipSpec spec)
+        {
+            Sprite[] frames = new Sprite[spec.DesiredNames.Length];
+            for (int i = 0; i < frames.Length; i++)
+            {
+                Sprite sprite = FindSprite(spec.DesiredNames[i]);
+                if (sprite == null)
+                {
+                    throw new FileNotFoundException("Required Jade Spirit sprite frame was not found or was not imported as a Sprite: " + spec.DesiredNames[i]);
+                }
+
+                frames[i] = sprite;
+            }
+
+            return frames;
+        }
+
         private static Sprite FindSprite(string baseName)
         {
             for (int i = 0; i < FrameFolders.Length; i++)
@@ -188,6 +260,32 @@ namespace Jade.EditorTools
                 if (sprite != null)
                 {
                     return sprite;
+                }
+
+                Object[] assets = AssetDatabase.LoadAllAssetsAtPath(path);
+                for (int j = 0; j < assets.Length; j++)
+                {
+                    sprite = assets[j] as Sprite;
+                    if (sprite != null)
+                    {
+                        return sprite;
+                    }
+                }
+
+                string[] guids = AssetDatabase.FindAssets(baseName + " t:Sprite", new[] { folder });
+                for (int j = 0; j < guids.Length; j++)
+                {
+                    string foundPath = AssetDatabase.GUIDToAssetPath(guids[j]);
+                    if (Path.GetFileNameWithoutExtension(foundPath) != baseName)
+                    {
+                        continue;
+                    }
+
+                    sprite = AssetDatabase.LoadAssetAtPath<Sprite>(foundPath);
+                    if (sprite != null)
+                    {
+                        return sprite;
+                    }
                 }
             }
 
@@ -220,12 +318,17 @@ namespace Jade.EditorTools
 
         private static AnimationClip CreateClip(ClipSpec spec, Sprite[] frames)
         {
-            AnimationClip clip = new AnimationClip
+            string path = AnimationFolder + "/JadeSpirit_" + spec.Name + ".anim";
+            AnimationClip clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(path);
+            bool isNewClip = clip == null;
+            if (isNewClip)
             {
-                name = "JadeSpirit_" + spec.Name,
-                frameRate = spec.FramesPerSecond,
-                wrapMode = spec.Loop ? WrapMode.Loop : WrapMode.Once
-            };
+                clip = new AnimationClip();
+            }
+
+            clip.name = "JadeSpirit_" + spec.Name;
+            clip.frameRate = spec.FramesPerSecond;
+            clip.wrapMode = spec.Loop ? WrapMode.Loop : WrapMode.Once;
 
             ObjectReferenceKeyframe[] keys = new ObjectReferenceKeyframe[frames.Length + 1];
             for (int i = 0; i < frames.Length; i++)
@@ -255,28 +358,35 @@ namespace Jade.EditorTools
             clipSettings.loopTime = spec.Loop;
             AnimationUtility.SetAnimationClipSettings(clip, clipSettings);
 
-            string path = AnimationFolder + "/JadeSpirit_" + spec.Name + ".anim";
-            if (AssetDatabase.LoadAssetAtPath<AnimationClip>(path) != null)
+            if (isNewClip)
             {
-                AssetDatabase.DeleteAsset(path);
+                AssetDatabase.CreateAsset(clip, path);
+            }
+            else
+            {
+                EditorUtility.SetDirty(clip);
             }
 
-            AssetDatabase.CreateAsset(clip, path);
             return clip;
         }
 
         private static AnimatorController CreateAnimatorController(Dictionary<string, AnimationClip> clips)
         {
-            if (AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath) != null)
+            AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+            if (controller == null)
             {
-                AssetDatabase.DeleteAsset(ControllerPath);
+                controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
+            }
+            else
+            {
+                ClearAnimatorController(controller);
             }
 
-            AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
             controller.AddParameter(PlayerAnimationDriver2D.Speed01Parameter, AnimatorControllerParameterType.Float);
             controller.AddParameter(PlayerAnimationDriver2D.VerticalSpeedParameter, AnimatorControllerParameterType.Float);
             controller.AddParameter(PlayerAnimationDriver2D.GroundedParameter, AnimatorControllerParameterType.Bool);
             controller.AddParameter(PlayerAnimationDriver2D.JumpedParameter, AnimatorControllerParameterType.Trigger);
+            controller.AddParameter(PlayerAnimationDriver2D.DoubleJumpedParameter, AnimatorControllerParameterType.Trigger);
             controller.AddParameter(PlayerAnimationDriver2D.LandedParameter, AnimatorControllerParameterType.Trigger);
             controller.AddParameter(PlayerAnimationDriver2D.DashingParameter, AnimatorControllerParameterType.Bool);
 
@@ -286,6 +396,7 @@ namespace Jade.EditorTools
             AnimatorState jumpRise = AddState(stateMachine, "JumpRise", clips, 510, -180);
             AnimatorState jumpApex = AddState(stateMachine, "JumpApex", clips, 770, -180);
             AnimatorState fall = AddState(stateMachine, "Fall", clips, 1030, -180);
+            AnimatorState doubleJump = AddState(stateMachine, "DoubleJump", clips, 510, -360);
             AnimatorState dash = AddState(stateMachine, "Dash", clips, 770, -360);
             stateMachine.defaultState = idle;
 
@@ -296,6 +407,9 @@ namespace Jade.EditorTools
 
             AnimatorStateTransition anyJump = AddAnyTransition(stateMachine, jumpRise, 0.03f);
             anyJump.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver2D.JumpedParameter);
+
+            AnimatorStateTransition anyDoubleJump = AddAnyTransition(stateMachine, doubleJump, 0.03f);
+            anyDoubleJump.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver2D.DoubleJumpedParameter);
 
             AnimatorStateTransition anyDash = AddAnyTransition(stateMachine, dash, 0.04f);
             anyDash.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver2D.DashingParameter);
@@ -317,6 +431,8 @@ namespace Jade.EditorTools
             AnimatorStateTransition apexToFall = AddTransition(jumpApex, fall, 0.04f);
             apexToFall.AddCondition(AnimatorConditionMode.Less, -0.1f, PlayerAnimationDriver2D.VerticalSpeedParameter);
 
+            AddAirStateReturnTransitions(doubleJump, jumpRise, jumpApex, fall, 0.65f, 0.04f);
+
             AnimatorStateTransition dashToRise = AddTransition(dash, jumpRise, 0.05f);
             dashToRise.AddCondition(AnimatorConditionMode.IfNot, 0f, PlayerAnimationDriver2D.DashingParameter);
             dashToRise.AddCondition(AnimatorConditionMode.Greater, 0.65f, PlayerAnimationDriver2D.VerticalSpeedParameter);
@@ -331,6 +447,109 @@ namespace Jade.EditorTools
             dashToFall.AddCondition(AnimatorConditionMode.Less, -0.1f, PlayerAnimationDriver2D.VerticalSpeedParameter);
 
             return controller;
+        }
+
+        private static void EnsureDoubleJumpAnimatorState(AnimatorController controller, AnimationClip doubleJumpClip)
+        {
+            EnsureParameter(controller, PlayerAnimationDriver2D.DoubleJumpedParameter, AnimatorControllerParameterType.Trigger);
+
+            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
+            AnimatorState jumpRise = FindState(stateMachine, "JumpRise");
+            AnimatorState jumpApex = FindState(stateMachine, "JumpApex");
+            AnimatorState fall = FindState(stateMachine, "Fall");
+            if (jumpRise == null || jumpApex == null || fall == null)
+            {
+                throw new FileNotFoundException("Cannot add Jade Spirit double jump state because JumpRise, JumpApex, or Fall is missing from the controller.");
+            }
+
+            AnimatorState doubleJump = FindState(stateMachine, "DoubleJump");
+            if (doubleJump == null)
+            {
+                doubleJump = stateMachine.AddState("DoubleJump", new Vector3(510, -360, 0f));
+            }
+
+            doubleJump.motion = doubleJumpClip;
+            RemoveTransitions(doubleJump);
+            RemoveAnyTransitionsTo(stateMachine, doubleJump);
+
+            AnimatorStateTransition anyDoubleJump = AddAnyTransition(stateMachine, doubleJump, 0.03f);
+            anyDoubleJump.AddCondition(AnimatorConditionMode.If, 0f, PlayerAnimationDriver2D.DoubleJumpedParameter);
+
+            AddAirStateReturnTransitions(doubleJump, jumpRise, jumpApex, fall, 0.65f, 0.04f);
+            EditorUtility.SetDirty(controller);
+        }
+
+        private static void EnsureParameter(AnimatorController controller, string name, AnimatorControllerParameterType type)
+        {
+            AnimatorControllerParameter[] parameters = controller.parameters;
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (parameters[i].name == name)
+                {
+                    return;
+                }
+            }
+
+            controller.AddParameter(name, type);
+        }
+
+        private static AnimatorState FindState(AnimatorStateMachine stateMachine, string name)
+        {
+            ChildAnimatorState[] states = stateMachine.states;
+            for (int i = 0; i < states.Length; i++)
+            {
+                if (states[i].state != null && states[i].state.name == name)
+                {
+                    return states[i].state;
+                }
+            }
+
+            return null;
+        }
+
+        private static void RemoveTransitions(AnimatorState state)
+        {
+            AnimatorStateTransition[] transitions = state.transitions;
+            for (int i = transitions.Length - 1; i >= 0; i--)
+            {
+                state.RemoveTransition(transitions[i]);
+            }
+        }
+
+        private static void RemoveAnyTransitionsTo(AnimatorStateMachine stateMachine, AnimatorState destination)
+        {
+            AnimatorStateTransition[] transitions = stateMachine.anyStateTransitions;
+            for (int i = transitions.Length - 1; i >= 0; i--)
+            {
+                if (transitions[i].destinationState == destination)
+                {
+                    stateMachine.RemoveAnyStateTransition(transitions[i]);
+                }
+            }
+        }
+
+        private static void ClearAnimatorController(AnimatorController controller)
+        {
+            AnimatorControllerParameter[] parameters = controller.parameters;
+            for (int i = parameters.Length - 1; i >= 0; i--)
+            {
+                controller.RemoveParameter(parameters[i]);
+            }
+
+            AnimatorStateMachine stateMachine = controller.layers[0].stateMachine;
+            ChildAnimatorState[] states = stateMachine.states;
+            for (int i = states.Length - 1; i >= 0; i--)
+            {
+                stateMachine.RemoveState(states[i].state);
+            }
+
+            AnimatorStateTransition[] anyStateTransitions = stateMachine.anyStateTransitions;
+            for (int i = anyStateTransitions.Length - 1; i >= 0; i--)
+            {
+                stateMachine.RemoveAnyStateTransition(anyStateTransitions[i]);
+            }
+
+            EditorUtility.SetDirty(controller);
         }
 
         private static AnimatorState AddState(AnimatorStateMachine stateMachine, string name, Dictionary<string, AnimationClip> clips, int x, int y)
@@ -376,6 +595,19 @@ namespace Jade.EditorTools
             ConfigureTransition(transition, false, 0f, 0.04f);
             transition.AddCondition(AnimatorConditionMode.IfNot, 0f, PlayerAnimationDriver2D.GroundedParameter);
             transition.AddCondition(AnimatorConditionMode.Less, -0.1f, PlayerAnimationDriver2D.VerticalSpeedParameter);
+        }
+
+        private static void AddAirStateReturnTransitions(AnimatorState from, AnimatorState jumpRise, AnimatorState jumpApex, AnimatorState fall, float exitTime, float duration)
+        {
+            AnimatorStateTransition toRise = AddExitTransition(from, jumpRise, exitTime, duration);
+            toRise.AddCondition(AnimatorConditionMode.Greater, 0.65f, PlayerAnimationDriver2D.VerticalSpeedParameter);
+
+            AnimatorStateTransition toApex = AddExitTransition(from, jumpApex, exitTime, duration);
+            toApex.AddCondition(AnimatorConditionMode.Less, 0.65f, PlayerAnimationDriver2D.VerticalSpeedParameter);
+            toApex.AddCondition(AnimatorConditionMode.Greater, -0.1f, PlayerAnimationDriver2D.VerticalSpeedParameter);
+
+            AnimatorStateTransition toFall = AddExitTransition(from, fall, exitTime, duration);
+            toFall.AddCondition(AnimatorConditionMode.Less, -0.1f, PlayerAnimationDriver2D.VerticalSpeedParameter);
         }
 
         private static void ConfigureTransition(AnimatorStateTransition transition, bool hasExitTime, float exitTime, float duration)
