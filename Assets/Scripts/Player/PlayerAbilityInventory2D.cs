@@ -6,9 +6,11 @@ namespace Jade.Player
     {
         [SerializeField] private bool dashUnlocked;
         [SerializeField] private bool doubleJumpUnlocked;
+        [SerializeField] private bool wallJumpUnlocked;
 
         public bool DashUnlocked => dashUnlocked;
         public bool DoubleJumpUnlocked => doubleJumpUnlocked;
+        public bool WallJumpUnlocked => wallJumpUnlocked;
 
         public void UnlockDash()
         {
@@ -30,6 +32,17 @@ namespace Jade.Player
 
             doubleJumpUnlocked = true;
             Debug.Log("Ability unlocked: Double Jump");
+        }
+
+        public void UnlockWallJump()
+        {
+            if (wallJumpUnlocked)
+            {
+                return;
+            }
+
+            wallJumpUnlocked = true;
+            Debug.Log("Ability unlocked: Wall Jump");
         }
     }
 }

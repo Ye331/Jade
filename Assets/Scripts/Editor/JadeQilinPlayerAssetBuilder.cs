@@ -140,7 +140,7 @@ namespace Jade.EditorTools
                 new ClipSpec("Run", Range("JadeSpirit_Run", 8), new[] { "JadeQilin_Run01", "JadeQilin_Run02", "JadeQilin_Run03", "JadeQilin_Run04" }, 10f, true),
                 new ClipSpec("JumpRise", Range("JadeSpirit_JumpRise", 3), new[] { "JadeQilin_Jump", "JadeQilin_Jump", "JadeQilin_Jump" }, 10f, true),
                 new ClipSpec("JumpApex", Range("JadeSpirit_JumpApex", 2), new[] { "JadeQilin_Jump", "JadeQilin_Fall" }, 8f, true),
-                new ClipSpec("Fall", Range("JadeSpirit_Fall", 3), new[] { "JadeQilin_Fall", "JadeQilin_Fall", "JadeQilin_Fall" }, 10f, true),
+                new ClipSpec("Fall", Range("JadeSpirit_Fall", 2), new[] { "JadeQilin_Fall", "JadeQilin_Fall" }, 8f, false),
                 new ClipSpec("DoubleJump", Range("JadeSpirit_DoubleJump", 4), new string[0], 18f, false),
                 new ClipSpec("Dash", Range("JadeSpirit_Dash", 4), new[] { "JadeSpirit_JumpRise_01", "JadeSpirit_Fall_01" }, 16f, false)
             };
@@ -638,6 +638,7 @@ namespace Jade.EditorTools
             root.AddComponent<PlayerInputReader>();
             root.AddComponent<PlayerAbilityInventory2D>();
             PlayerMotor2D motor = root.AddComponent<PlayerMotor2D>();
+            root.AddComponent<PlayerHealth2D>();
             PlayerMovementSettings movementSettings = AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>(MovementSettingsPath);
             if (movementSettings != null)
             {
