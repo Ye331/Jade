@@ -47,7 +47,7 @@
         <mxCell id="15" value="DoubleJump_TutorialStep_03" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#2d1e3a;fontSize=15;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="1180" y="250" width="260" height="56" as="geometry" />
         </mxCell>
-        <mxCell id="16" value="Exit_ToWallJumpRegion&#xa;upper-right transition platform" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d9d9d9;strokeColor=#666666;fontColor=#222222;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+        <mxCell id="16" value="Exit_ToFinalClimbRegion&#xa;upper-right transition platform" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d9d9d9;strokeColor=#666666;fontColor=#222222;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="1285" y="145" width="245" height="68" as="geometry" />
         </mxCell>
         <mxCell id="17" value="Soft Fall Pit&#xa;safe reset to lower layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b9d8e6;strokeColor=#4f8aa3;fontColor=#0d2d3d;fontSize=15;" vertex="1" parent="1">

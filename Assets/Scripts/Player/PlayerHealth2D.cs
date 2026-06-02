@@ -12,11 +12,13 @@ namespace Jade.Player
 
         public int MaxHealth => maxHealth;
         public int CurrentHealth => currentHealth;
+        public event System.Action<int, int> HealthChanged;
 
         private void Awake()
         {
             motor = GetComponent<PlayerMotor2D>();
             currentHealth = Mathf.Max(1, maxHealth);
+            NotifyHealthChanged();
         }
 
         public void TakeDamage(int amount, string source)
@@ -28,6 +30,7 @@ namespace Jade.Player
 
             currentHealth = Mathf.Max(0, currentHealth - amount);
             Debug.Log("Player took " + amount + " damage from " + source + ". HP: " + currentHealth + "/" + maxHealth);
+            NotifyHealthChanged();
 
             if (currentHealth <= 0)
             {
@@ -45,6 +48,15 @@ namespace Jade.Player
         {
             currentHealth = Mathf.Max(1, maxHealth);
             Debug.Log("Player health restored to " + currentHealth + "/" + maxHealth + ".");
+            NotifyHealthChanged();
+        }
+
+        private void NotifyHealthChanged()
+        {
+            if (HealthChanged != null)
+            {
+                HealthChanged(currentHealth, maxHealth);
+            }
         }
     }
 }

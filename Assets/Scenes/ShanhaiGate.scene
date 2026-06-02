@@ -1,4 +1,4 @@
-%YAML 1.1
+﻿%YAML 1.1
 %TAG !u! tag:yousandi.cn,2023:
 --- !u!29 &1
 OcclusionCullingSettings:
@@ -230,14 +230,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c744ae7056ea4d68ace56b480880ad4a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   target: {fileID: 1630482063}
   offset: {x: 1.5, y: 2}
   lookAheadDistance: 1.25
   horizontalSmoothTime: 0.16
   verticalSmoothTime: 0.28
   minimumX: 0
+  useMaximumX: 0
+  maximumX: 0
+  useYLimits: 0
+  yLimits: {x: -4, y: 4}
   deadZone: {x: 1.8, y: 1.1}
   lookDownStartX: 100
   lookDownOffsetY: -3
@@ -1093,8 +1097,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b51ef0b62cb4e2681e89cdb2d68b727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!114 &246971658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1105,8 +1109,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb8fd2f9aa8c4650a2be04dd8aa0f2a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!61 &246971659
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1196,8 +1200,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b51ef0b62cb4e2681e89cdb2d68b727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!212 &285278087
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1587,8 +1591,8 @@ Sprite:
   m_Pivot: {x: 0.5, y: 0.5}
   m_Extrude: 0
   m_IsPolygon: 0
-  m_AtlasName: 
-  m_PackingTag: 
+  m_AtlasName:
+  m_PackingTag:
   m_RenderDataKey:
     00000000000000000000000000000000: 0
   m_AtlasTags: []
@@ -1777,7 +1781,7 @@ Sprite:
     downscaleMultiplier: 1
   m_PhysicsShape: []
   m_Bones: []
-  m_SpriteID: 
+  m_SpriteID:
 --- !u!1 &466478524
 GameObject:
   m_ObjectHideFlags: 0
@@ -2002,8 +2006,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f4a5a1e64304a73b9f0b4f7e4ef1d21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   hazardName: Gap01_FallCatch
   damage: 1
   damageCooldown: 1
@@ -2467,8 +2471,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b51ef0b62cb4e2681e89cdb2d68b727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1 &1070375171
 GameObject:
   m_ObjectHideFlags: 0
@@ -2514,8 +2518,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b51ef0b62cb4e2681e89cdb2d68b727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!199 &1070375174
 ParticleSystemRenderer:
   serializedVersion: 6
@@ -7361,8 +7365,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 352dafd2bf14d234882903aaa51866dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   cameraTransform: {fileID: 1001}
   parallaxFactor: {x: 0.03, y: 0.015}
   driftSpeed: {x: 0.003, y: 0}
@@ -7785,8 +7789,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b51ef0b62cb4e2681e89cdb2d68b727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!199 &1334931901
 ParticleSystemRenderer:
   serializedVersion: 6
@@ -12933,8 +12937,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b51ef0b62cb4e2681e89cdb2d68b727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!4 &1496776285
 Transform:
   m_ObjectHideFlags: 0
@@ -13208,20 +13212,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b51ef0b62cb4e2681e89cdb2d68b727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1630482074
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1630482062}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f4f5be0a45d4e7d8e80d8ac6d8d9275, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!114 &1630482065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13232,8 +13224,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d05def1be944d01a00370cbc3ad8469, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   visualRoot: {fileID: 993084499}
   landingDust: {fileID: 1334931902}
   runDust: {fileID: 1070375175}
@@ -13251,8 +13243,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2ea3e95c6ce04464a9b5df7b7ad7445a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   animator: {fileID: 0}
   runAnimationMinSpeed: 0.85
   runAnimationMaxSpeed: 1.15
@@ -13274,7 +13266,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_WarningMessage: 
+  m_WarningMessage:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -13289,11 +13281,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e69f2b5c62a24c15a90d25524be2d341, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   dashUnlocked: 0
   doubleJumpUnlocked: 0
-  wallJumpUnlocked: 0
 --- !u!114 &1630482069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13304,8 +13295,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 287f3a10317a4c6aac3f3e115539934f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   settings: {fileID: 11400000, guid: 2b4503282e4e40488a1fe41eb4bbf774, type: 2}
 --- !u!114 &1630482070
 MonoBehaviour:
@@ -13317,8 +13308,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2c2f1dd57214405b99aecb91f165b5ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!61 &1630482071
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -13401,9 +13392,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6a76c5f84c6f42bda9bc1d9a7d9c1fb6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   maxHealth: 3
+--- !u!114 &1630482074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1630482062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f4f5be0a45d4e7d8e80d8ac6d8d9275, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1 &1660645753
 GameObject:
   m_ObjectHideFlags: 0
@@ -13611,10 +13614,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 550cba67fe4ce5046a673e2ea69988ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   targetSceneName: ShanhaiCave01
-  loadingSceneName: 
+  loadingSceneName:
   loadingMinimumSeconds: 0.75
 --- !u!61 &1766133736
 BoxCollider2D:
@@ -13722,8 +13725,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f4a5a1e64304a73b9f0b4f7e4ef1d21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   hazardName: Gap02_FallCatch
   damage: 1
   damageCooldown: 1
@@ -14010,8 +14013,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b51ef0b62cb4e2681e89cdb2d68b727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!114 &1878649360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14022,8 +14025,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f4a5a1e64304a73b9f0b4f7e4ef1d21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   hazardName: SpikeRead_ShallowTrap
   damage: 1
   damageCooldown: 1
@@ -14151,13 +14154,13 @@ Texture2D:
   m_UploadedMode: 0
   m_DataStreamData:
     size: 0
-    path: 
+    path:
   m_TextureFormat: 4
   m_MipCount: 1
   m_IsReadable: 1
   m_IsPreProcessed: 0
   m_IgnoreMipmapLimit: 0
-  m_MipmapLimitGroupName: 
+  m_MipmapLimitGroupName:
   m_StreamingMipmaps: 0
   m_StreamingMipmapsPriority: 0
   m_VTOnly: 0
@@ -14174,14 +14177,14 @@ Texture2D:
     m_WrapW: 0
   m_LightmapFormat: 0
   m_ColorSpace: 1
-  m_PlatformBlob: 
+  m_PlatformBlob:
   image data: 4
   _typelessdata: ffffffff
   m_StreamData:
     serializedVersion: 2
     offset: 0
     size: 0
-    path: 
+    path:
   m_OriginalWidth: 0
   m_OriginalHeight: 0
   m_OriginalAssetGuid: 00000000000000000000000000000000
@@ -14318,8 +14321,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 352dafd2bf14d234882903aaa51866dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   cameraTransform: {fileID: 1001}
   parallaxFactor: {x: 0, y: 0}
   driftSpeed: {x: 0.001, y: 0}
@@ -15478,8 +15481,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f4a5a1e64304a73b9f0b4f7e4ef1d21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   hazardName: Gap03_FallCatch
   damage: 1
   damageCooldown: 1
@@ -15630,8 +15633,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f4a5a1e64304a73b9f0b4f7e4ef1d21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   hazardName: Gap04_FallCatch
   damage: 1
   damageCooldown: 1
@@ -15782,8 +15785,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f4a5a1e64304a73b9f0b4f7e4ef1d21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   hazardName: Gap05_FallCatch
   damage: 1
   damageCooldown: 1
@@ -15934,8 +15937,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2f4a5a1e64304a73b9f0b4f7e4ef1d21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   hazardName: Gap06_FallCatch
   damage: 1
   damageCooldown: 1
@@ -16086,8 +16089,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14db7bf98f624d89b4fc29410634797f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   platformRenderer: {fileID: 980195110}
   platformCollider: {fileID: 3100000082}
   platformName: BreakablePlatform_ToPhase02_01
@@ -16245,8 +16248,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c068439c984412e977e5a163c209c99, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   target: {fileID: 0}
   firePoint: {fileID: 0}
   projectileSprite: {fileID: 21300000, guid: b1161216597af0745aa347ef33300bdc, type: 3}
@@ -16266,8 +16269,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b51ef0b62cb4e2681e89cdb2d68b727, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

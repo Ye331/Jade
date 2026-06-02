@@ -16,15 +16,14 @@ namespace Jade.EditorTools
                     "Shanhai Gate graybox reachability failed. "
                     + "DashGate=" + report.NoAbilityStopsAtDash
                     + ", DashToDoubleJump=" + report.DashReachesDoubleJump
-                    + ", DashCannotWallJump=" + report.DashCannotReachWallJump
-                    + ", DoubleJumpToWallJump=" + report.DoubleJumpReachesWallJump
-                    + ", DoubleJumpCannotFinal=" + report.DoubleJumpCannotReachFinal
-                    + ", WallJumpAllShards=" + report.WallJumpReachesAllShards
+                    + ", DashCannotFinal=" + report.DashCannotReachFinal
+                    + ", DoubleJumpAllShards=" + report.DoubleJumpReachesAllShards
+                    + ", DoubleJumpFinal=" + report.DoubleJumpReachesFinal
                     + ", GateRequiresFour=" + report.GateRequiresAllFour);
                 return;
             }
 
-            Debug.Log("Shanhai Gate graybox reachability passed: dash -> double jump -> wall jump -> four shards -> gate.");
+            Debug.Log("Shanhai Gate graybox reachability passed: dash -> double jump -> four shards -> gate.");
         }
     }
 }

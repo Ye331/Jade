@@ -1,4 +1,5 @@
 using Jade.Player;
+using Jade.UI;
 using UnityEngine;
 
 namespace Jade.World
@@ -10,19 +11,38 @@ namespace Jade.World
         public void Configure(SpriteRenderer renderer)
         {
             visual = renderer;
+            ConfigurePromptZone();
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void Awake()
         {
-            PlayerAbilityInventory2D abilities = other.GetComponent<PlayerAbilityInventory2D>();
-            if (abilities == null)
+            ConfigurePromptZone();
+        }
+
+        private void ConfigurePromptZone()
+        {
+            AbilityPromptZone2D zone = GetComponent<AbilityPromptZone2D>();
+            if (zone == null)
             {
-                return;
+                zone = gameObject.AddComponent<AbilityPromptZone2D>();
             }
 
+            zone.Configure(
+                "按 E 激活灵渠台",
+                "提示：按 Shift 瞬间向前冲刺一段距离",
+                UnlockDash,
+                CanUnlockDash);
+        }
+
+        private void UnlockDash(PlayerAbilityInventory2D abilities)
+        {
             abilities.UnlockDash();
             Debug.Log("Picked up ability: Air Dash");
-            gameObject.SetActive(false);
+        }
+
+        private static bool CanUnlockDash(PlayerAbilityInventory2D abilities)
+        {
+            return abilities != null && !abilities.DashUnlocked;
         }
     }
 }

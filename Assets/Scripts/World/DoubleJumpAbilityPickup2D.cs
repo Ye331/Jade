@@ -1,4 +1,5 @@
 using Jade.Player;
+using Jade.UI;
 using UnityEngine;
 
 namespace Jade.World
@@ -10,19 +11,38 @@ namespace Jade.World
         public void Configure(SpriteRenderer renderer)
         {
             visual = renderer;
+            ConfigurePromptZone();
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void Awake()
         {
-            PlayerAbilityInventory2D abilities = other.GetComponent<PlayerAbilityInventory2D>();
-            if (abilities == null)
+            ConfigurePromptZone();
+        }
+
+        private void ConfigurePromptZone()
+        {
+            AbilityPromptZone2D zone = GetComponent<AbilityPromptZone2D>();
+            if (zone == null)
             {
-                return;
+                zone = gameObject.AddComponent<AbilityPromptZone2D>();
             }
 
+            zone.Configure(
+                "按 E 激活灵渠台",
+                "提示：连续两次空格可进行二段跳",
+                UnlockDoubleJump,
+                CanUnlockDoubleJump);
+        }
+
+        private void UnlockDoubleJump(PlayerAbilityInventory2D abilities)
+        {
             abilities.UnlockDoubleJump();
             Debug.Log("Picked up ability: Double Jump");
-            gameObject.SetActive(false);
+        }
+
+        private static bool CanUnlockDoubleJump(PlayerAbilityInventory2D abilities)
+        {
+            return abilities != null && !abilities.DoubleJumpUnlocked;
         }
     }
 }
