@@ -4,6 +4,10 @@ namespace Jade.Player
 {
     public class PlayerAbilityInventory2D : MonoBehaviour
     {
+        private static bool savedDashUnlocked;
+        private static bool savedDoubleJumpUnlocked;
+        private static bool savedWallJumpUnlocked;
+
         [SerializeField] private bool dashUnlocked;
         [SerializeField] private bool doubleJumpUnlocked;
         [SerializeField] private bool wallJumpUnlocked;
@@ -11,6 +15,22 @@ namespace Jade.Player
         public bool DashUnlocked => dashUnlocked;
         public bool DoubleJumpUnlocked => doubleJumpUnlocked;
         public bool WallJumpUnlocked => wallJumpUnlocked;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetSavedState()
+        {
+            savedDashUnlocked = false;
+            savedDoubleJumpUnlocked = false;
+            savedWallJumpUnlocked = false;
+        }
+
+        private void Awake()
+        {
+            dashUnlocked = dashUnlocked || savedDashUnlocked;
+            doubleJumpUnlocked = doubleJumpUnlocked || savedDoubleJumpUnlocked;
+            wallJumpUnlocked = wallJumpUnlocked || savedWallJumpUnlocked;
+            SaveCurrentState();
+        }
 
         public void UnlockDash()
         {
@@ -20,6 +40,7 @@ namespace Jade.Player
             }
 
             dashUnlocked = true;
+            savedDashUnlocked = true;
             Debug.Log("Ability unlocked: Air Dash");
         }
 
@@ -31,6 +52,7 @@ namespace Jade.Player
             }
 
             doubleJumpUnlocked = true;
+            savedDoubleJumpUnlocked = true;
             Debug.Log("Ability unlocked: Double Jump");
         }
 
@@ -42,7 +64,15 @@ namespace Jade.Player
             }
 
             wallJumpUnlocked = true;
+            savedWallJumpUnlocked = true;
             Debug.Log("Ability unlocked: Wall Jump");
+        }
+
+        private void SaveCurrentState()
+        {
+            savedDashUnlocked = savedDashUnlocked || dashUnlocked;
+            savedDoubleJumpUnlocked = savedDoubleJumpUnlocked || doubleJumpUnlocked;
+            savedWallJumpUnlocked = savedWallJumpUnlocked || wallJumpUnlocked;
         }
     }
 }

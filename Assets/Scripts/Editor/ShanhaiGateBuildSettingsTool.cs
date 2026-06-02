@@ -12,6 +12,7 @@ namespace Jade.EditorTools
             {
                 "Assets/Scenes/ShanhaiGate.scene",
                 "Assets/Scenes/ShanhaiCave01.scene",
+                "Assets/Scenes/ShanhaiCave02.scene",
             };
 
             List<EditorBuildSettingsScene> scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);

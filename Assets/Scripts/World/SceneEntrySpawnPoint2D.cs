@@ -45,6 +45,11 @@ namespace Jade.World
                 return existingPlayer;
             }
 
+            if (PersistentPlayer2D.CurrentPlayer != null)
+            {
+                return PersistentPlayer2D.CurrentPlayer;
+            }
+
             GameObject prefab = playerPrefab != null ? playerPrefab : LoadPlayerPrefab();
             if (prefab == null)
             {
