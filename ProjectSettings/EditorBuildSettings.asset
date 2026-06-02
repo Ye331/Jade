@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.scene
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
@@ -20,4 +20,25 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Prototype/Phase04_FirstPlayableLevel.scene
     guid: b743b1623c1d4d2c8ae984d9da351495
+  - enabled: 1
+    path: Assets/Scenes/ShanhaiGate.scene
+    guid: 7a4d5b8e925d49a69f9e0d3a4c8f2107
+  - enabled: 1
+    path: Assets/Scenes/ShanhaiCave01.scene
+    guid: cd1686796eb427c49a07e23b12435af5
+  - enabled: 1
+    path: Assets/Scenes/ShanhaiCave02.scene
+    guid: 1fc14e08e46316f4886919bf7993ce54
+  - enabled: 1
+    path: Assets/Scenes/ShanhaiCave03.scene
+    guid: 769ce41067a67874ca283fdd2b5a61c8
+  m_BuildProfiles: []
   m_configObjects: {}
+  m_SlimFeaturesWeixinMiniGame:
+    AllocateOverhead: 1
+    DecompressASTC: 0
+    DecompressDXT: 1
+    DecompressETC: 1
+    FreeTypeSfntPng: 1
+    LightProbe: 2
+    UseStringInternPool: 2

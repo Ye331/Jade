@@ -10,14 +10,14 @@ namespace Jade.EditorTools
 {
     public static class PrototypeLevelBakeTool
     {
-        private const string BakedRootName = "__BakedPrototypeLevel";
+        private const string BakedRootName = "__BakedGrayboxLevel";
 
-        [MenuItem("Jade/Bake Current Prototype Level To Scene")]
+        [MenuItem("Jade/Bake Current Graybox Level To Scene")]
         public static void BakeCurrentPrototypeLevelToScene()
         {
             if (Application.isPlaying)
             {
-                EditorUtility.DisplayDialog("Bake Prototype Level", "Exit Play Mode before baking a prototype level.", "OK");
+                EditorUtility.DisplayDialog("Bake Graybox Level", "Exit Play Mode before baking a graybox level.", "OK");
                 return;
             }
 
@@ -25,14 +25,14 @@ namespace Jade.EditorTools
             MonoBehaviour builder = FindSceneBuilder(scene);
             if (builder == null)
             {
-                EditorUtility.DisplayDialog("Bake Prototype Level", "No Prototype scene builder was found in the active scene.", "OK");
+                EditorUtility.DisplayDialog("Bake Graybox Level", "No graybox scene builder was found in the active scene.", "OK");
                 return;
             }
 
             MethodInfo buildMethod = GetBuildMethod(builder);
             if (buildMethod == null)
             {
-                EditorUtility.DisplayDialog("Bake Prototype Level", "The selected scene builder does not expose a BuildScene method.", "OK");
+                EditorUtility.DisplayDialog("Bake Graybox Level", "The selected scene builder does not expose a BuildScene method.", "OK");
                 return;
             }
 
@@ -70,17 +70,17 @@ namespace Jade.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
 
             EditorUtility.DisplayDialog(
-                "Bake Prototype Level",
-                "Baked the prototype level into the scene and disabled the runtime builder to avoid duplicate objects in Play Mode.",
+                "Bake Graybox Level",
+                "Baked the graybox level into the scene and disabled the runtime builder to avoid duplicate objects in Play Mode.",
                 "OK");
         }
 
-        [MenuItem("Jade/Clear Baked Prototype Level")]
+        [MenuItem("Jade/Clear Baked Graybox Level")]
         public static void ClearCurrentBakedPrototypeLevel()
         {
             if (Application.isPlaying)
             {
-                EditorUtility.DisplayDialog("Clear Baked Prototype Level", "Exit Play Mode before clearing baked prototype objects.", "OK");
+                EditorUtility.DisplayDialog("Clear Baked Graybox Level", "Exit Play Mode before clearing baked graybox objects.", "OK");
                 return;
             }
 
@@ -88,7 +88,7 @@ namespace Jade.EditorTools
             int count = ClearBakedPrototypeLevel(scene);
             SetSceneBuildersActive(scene, true);
             EditorSceneManager.MarkSceneDirty(scene);
-            EditorUtility.DisplayDialog("Clear Baked Prototype Level", "Removed " + count + " baked prototype object(s).", "OK");
+            EditorUtility.DisplayDialog("Clear Baked Graybox Level", "Removed " + count + " baked graybox object(s).", "OK");
         }
 
         private static MonoBehaviour FindSceneBuilder(Scene scene)
@@ -144,7 +144,7 @@ namespace Jade.EditorTools
 
             System.Type type = behaviour.GetType();
             return type.Namespace == "Jade.World"
-                && type.Name.StartsWith("Prototype")
+                && (type.Name.StartsWith("Prototype") || type.Name.StartsWith("ShanhaiGate"))
                 && GetBuildMethod(behaviour) != null;
         }
 

@@ -34,6 +34,14 @@ namespace Jade.Player
         public float dashVerticalSpeed = 0f;
         public int airDashCount = 1;
 
+        [Header("Wall Jump")]
+        public float wallCheckDistance = 0.12f;
+        [Range(0.1f, 1f)] public float wallCheckHeight = 0.75f;
+        public float wallSlideMaxFallSpeed = 2.8f;
+        public float wallJumpHorizontalSpeed = 5.8f;
+        public float wallJumpVerticalMultiplier = 0.95f;
+        public float wallJumpControlLockTime = 0.06f;
+
         [Header("Ground Check")]
         public LayerMask groundLayer = ~0;
         public float groundCheckDistance = 0.06f;

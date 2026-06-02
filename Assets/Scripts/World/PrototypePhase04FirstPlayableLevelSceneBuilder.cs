@@ -26,6 +26,7 @@ namespace Jade.World
             Camera cameraToUse = CreateCamera(player.transform);
             CreateBackground(cameraToUse);
             CreateRoute(sprite);
+            CreateEnvironmentArtPass(sprite);
             CreateDashAbilityPickup(sprite, new Vector2(2.5f, -2.25f));
             CreateDoubleJumpAbilityPickup(sprite, new Vector2(31f, -0.45f));
             CreateCheckpoint(sprite, "Checkpoint_FirstShrine", new Vector2(46f, -0.75f));
@@ -147,6 +148,17 @@ namespace Jade.World
             CreateBox(sprite, "Goal_Platform", new Vector2(91f, 2.25f), new Vector2(4f, 0.55f), PlatformColor(RouteBand.Goal));
 
             CreateHazardMarker(sprite, "FallZone_VisualGuide", new Vector2(43f, -7.1f), new Vector2(65f, 0.12f));
+        }
+
+        private void CreateEnvironmentArtPass(Sprite sprite)
+        {
+            PrototypePhase04EnvironmentArtPass2D artPass = GetComponent<PrototypePhase04EnvironmentArtPass2D>();
+            if (artPass == null)
+            {
+                artPass = gameObject.AddComponent<PrototypePhase04EnvironmentArtPass2D>();
+            }
+
+            artPass.Build(sprite);
         }
 
         private static void CreateBackground(Camera cameraToUse)

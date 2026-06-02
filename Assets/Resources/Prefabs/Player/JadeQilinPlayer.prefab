@@ -9834,6 +9834,7 @@ GameObject:
   - component: {fileID: 1686587295843137145}
   - component: {fileID: 2021548883759959868}
   - component: {fileID: 6982583027331282271}
+  - component: {fileID: 910000000000000001}
   m_Layer: 0
   m_HasEditorInfo: 1
   m_Name: JadeQilinPlayer
@@ -10028,6 +10029,18 @@ MonoBehaviour:
   runTiltDegrees: 7
   fastSpeedThreshold: 5.5
   squashReturnSpeed: 12
+--- !u!114 &910000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6277569740454333896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f4f5be0a45d4e7d8e80d8ac6d8d9275, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7881712196957627780
 GameObject:
   m_ObjectHideFlags: 0

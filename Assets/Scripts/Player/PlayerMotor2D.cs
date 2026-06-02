@@ -20,27 +20,33 @@ namespace Jade.Player
         private float jumpBufferCounter;
         private float dashTimer;
         private float dashCooldownCounter;
+        private float wallJumpControlLockCounter;
         private float gravity;
         private float jumpVelocity;
         private bool isGrounded;
         private bool wasGrounded;
+        private bool isTouchingWall;
         private bool landedThisFrame;
         private bool jumpedThisFrame;
         private bool doubleJumpedThisFrame;
+        private bool wallJumpedThisFrame;
         private bool dashedThisFrame;
         private bool isDashing;
         private int airJumpsRemaining;
         private int airDashesRemaining;
         private int facingDirection = 1;
         private int dashDirection = 1;
+        private int wallDirection;
 
         public int FacingDirection => facingDirection;
         public bool IsGrounded => isGrounded;
         public bool LandedThisFrame => landedThisFrame;
         public bool JumpedThisFrame => jumpedThisFrame;
         public bool DoubleJumpedThisFrame => doubleJumpedThisFrame;
+        public bool WallJumpedThisFrame => wallJumpedThisFrame;
         public bool DashedThisFrame => dashedThisFrame;
         public bool IsDashing => isDashing;
+        public bool IsTouchingWall => isTouchingWall;
         public Vector2 Velocity => body != null ? body.velocity : Vector2.zero;
         public float VerticalSpeed => body != null ? body.velocity.y : 0f;
         public float Speed01 => settings != null && settings.maxRunSpeed > 0f
@@ -51,6 +57,11 @@ namespace Jade.Player
         {
             settings = movementSettings;
             RecalculateJumpValues();
+            if (body != null)
+            {
+                ResetAirJumpCount();
+                ResetAirDashCount();
+            }
         }
 
         private void Awake()
@@ -86,10 +97,12 @@ namespace Jade.Player
 
             landedThisFrame = false;
             jumpedThisFrame = false;
+            wallJumpedThisFrame = false;
             dashedThisFrame = false;
             wasGrounded = isGrounded;
 
             UpdateGroundedState();
+            UpdateWallState();
             UpdateTimers();
             TryStartDash();
             if (isDashing)
@@ -100,6 +113,7 @@ namespace Jade.Player
 
             HandleJumpInput();
             HandleRun();
+            HandleWallSlide();
             HandleGravity();
         }
 
@@ -109,6 +123,7 @@ namespace Jade.Player
             transform.position = spawnPosition;
             isDashing = false;
             dashTimer = 0f;
+            wallJumpControlLockCounter = 0f;
             ResetAirJumpCount();
             ResetAirDashCount();
         }
@@ -116,6 +131,17 @@ namespace Jade.Player
         public void SetSpawnPoint(Vector3 position)
         {
             spawnPosition = position;
+        }
+
+        public void TeleportTo(Vector3 position, Vector2 velocity)
+        {
+            transform.position = position;
+            body.velocity = velocity;
+            isDashing = false;
+            dashTimer = 0f;
+            wallJumpControlLockCounter = 0f;
+            ResetAirJumpCount();
+            ResetAirDashCount();
         }
 
         public bool ConsumeDoubleJumpedThisFrame()
@@ -193,6 +219,11 @@ namespace Jade.Player
                 dashCooldownCounter -= step;
             }
 
+            if (wallJumpControlLockCounter > 0f)
+            {
+                wallJumpControlLockCounter -= step;
+            }
+
             if (input.ConsumeJumpPressed())
             {
                 jumpBufferCounter = settings.jumpBufferTime;
@@ -206,7 +237,7 @@ namespace Jade.Player
                 return;
             }
 
-            if (abilities == null || !abilities.DashUnlocked || isGrounded || isDashing || airDashesRemaining <= 0 || dashCooldownCounter > 0f)
+            if (abilities == null || !abilities.DashUnlocked || isDashing || airDashesRemaining <= 0 || dashCooldownCounter > 0f)
             {
                 return;
             }
@@ -229,7 +260,7 @@ namespace Jade.Player
             dashTimer -= Time.fixedDeltaTime;
             body.velocity = new Vector2(dashDirection * settings.dashSpeed, settings.dashVerticalSpeed);
 
-            if (dashTimer <= 0f || isGrounded)
+            if (dashTimer <= 0f)
             {
                 isDashing = false;
             }
@@ -257,6 +288,23 @@ namespace Jade.Player
                 coyoteCounter = 0f;
                 isGrounded = false;
                 jumpedThisFrame = true;
+                return;
+            }
+
+            if (jumpBufferCounter > 0f && CanWallJump())
+            {
+                int jumpDirection = -wallDirection;
+                Vector2 velocity = body.velocity;
+                velocity.x = jumpDirection * settings.wallJumpHorizontalSpeed;
+                velocity.y = jumpVelocity * settings.wallJumpVerticalMultiplier;
+                body.velocity = velocity;
+
+                facingDirection = jumpDirection;
+                wallJumpControlLockCounter = settings.wallJumpControlLockTime;
+                jumpBufferCounter = 0f;
+                coyoteCounter = 0f;
+                isGrounded = false;
+                wallJumpedThisFrame = true;
                 return;
             }
 
@@ -290,8 +338,22 @@ namespace Jade.Player
                 && airJumpsRemaining > 0;
         }
 
+        private bool CanWallJump()
+        {
+            return abilities != null
+                && abilities.WallJumpUnlocked
+                && !isGrounded
+                && isTouchingWall
+                && wallDirection != 0;
+        }
+
         private void HandleRun()
         {
+            if (wallJumpControlLockCounter > 0f)
+            {
+                return;
+            }
+
             float horizontal = input.Horizontal;
 
             if (Mathf.Abs(horizontal) > 0.01f)
@@ -320,6 +382,18 @@ namespace Jade.Player
             body.velocity = new Vector2(newX, body.velocity.y);
         }
 
+        private void HandleWallSlide()
+        {
+            if (!CanWallJump() || body.velocity.y >= 0f)
+            {
+                return;
+            }
+
+            Vector2 velocity = body.velocity;
+            velocity.y = Mathf.Max(velocity.y, -settings.wallSlideMaxFallSpeed);
+            body.velocity = velocity;
+        }
+
         private void HandleGravity()
         {
             Vector2 velocity = body.velocity;
@@ -345,6 +419,52 @@ namespace Jade.Player
             }
 
             body.velocity = velocity;
+        }
+
+        private void UpdateWallState()
+        {
+            isTouchingWall = false;
+            wallDirection = 0;
+
+            if (settings == null || bodyCollider == null)
+            {
+                return;
+            }
+
+            Bounds bounds = bodyCollider.bounds;
+            Vector2 checkSize = new Vector2(bounds.size.x, bounds.size.y * settings.wallCheckHeight);
+            if (CheckWall(bounds.center, checkSize, Vector2.right, 1))
+            {
+                return;
+            }
+
+            CheckWall(bounds.center, checkSize, Vector2.left, -1);
+        }
+
+        private bool CheckWall(Vector2 origin, Vector2 checkSize, Vector2 direction, int directionSign)
+        {
+            RaycastHit2D[] hits = Physics2D.BoxCastAll(
+                origin,
+                checkSize,
+                0f,
+                direction,
+                settings.wallCheckDistance,
+                settings.groundLayer);
+
+            for (int i = 0; i < hits.Length; i++)
+            {
+                Collider2D hitCollider = hits[i].collider;
+                if (hitCollider == null || hitCollider == bodyCollider || hitCollider.isTrigger)
+                {
+                    continue;
+                }
+
+                isTouchingWall = true;
+                wallDirection = directionSign;
+                return true;
+            }
+
+            return false;
         }
     }
 }
