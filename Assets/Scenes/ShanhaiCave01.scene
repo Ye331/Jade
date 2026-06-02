@@ -1569,7 +1569,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dashUnlocked: 0
   doubleJumpUnlocked: 0
-  wallJumpUnlocked: 0
 --- !u!114 &943138021
 MonoBehaviour:
   m_ObjectHideFlags: 0
