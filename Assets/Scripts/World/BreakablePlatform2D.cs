@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 namespace Jade.World
 {
@@ -7,8 +8,13 @@ namespace Jade.World
         [SerializeField] private SpriteRenderer platformRenderer;
         [SerializeField] private Collider2D platformCollider;
         [SerializeField] private string platformName = "Breakable Platform";
+        [SerializeField] private Sprite[] breakAnimationFrames;
+        [SerializeField] private Sprite brokenSprite;
+        [SerializeField] private float breakFrameDuration = 0.12f;
+        [SerializeField] private bool hideRendererAfterBreak = false;
 
         private bool broken;
+        private Coroutine breakRoutine;
 
         public bool IsBroken => broken;
 
@@ -40,17 +46,56 @@ namespace Jade.World
             }
 
             broken = true;
-            if (platformRenderer != null)
-            {
-                platformRenderer.enabled = false;
-            }
-
             if (platformCollider != null)
             {
                 platformCollider.enabled = false;
             }
 
+            if (breakRoutine != null)
+            {
+                StopCoroutine(breakRoutine);
+            }
+
+            breakRoutine = StartCoroutine(PlayBreakAnimation());
             Debug.Log(platformName + " was broken by monster projectile.");
+        }
+
+        private IEnumerator PlayBreakAnimation()
+        {
+            if (platformRenderer == null)
+            {
+                yield break;
+            }
+
+            platformRenderer.enabled = true;
+            if (breakAnimationFrames != null)
+            {
+                for (int i = 0; i < breakAnimationFrames.Length; i++)
+                {
+                    if (breakAnimationFrames[i] == null)
+                    {
+                        continue;
+                    }
+
+                    platformRenderer.sprite = breakAnimationFrames[i];
+                    yield return new WaitForSeconds(Mathf.Max(0.01f, breakFrameDuration));
+                }
+            }
+
+            if (brokenSprite != null)
+            {
+                platformRenderer.sprite = brokenSprite;
+                platformRenderer.enabled = true;
+            }
+            else
+            {
+                platformRenderer.enabled = !hideRendererAfterBreak;
+            }
+
+            if (hideRendererAfterBreak)
+            {
+                platformRenderer.enabled = false;
+            }
         }
     }
 }

@@ -133,6 +133,17 @@ namespace Jade.Player
             spawnPosition = position;
         }
 
+        public void TeleportTo(Vector3 position, Vector2 velocity)
+        {
+            transform.position = position;
+            body.velocity = velocity;
+            isDashing = false;
+            dashTimer = 0f;
+            wallJumpControlLockCounter = 0f;
+            ResetAirJumpCount();
+            ResetAirDashCount();
+        }
+
         public bool ConsumeDoubleJumpedThisFrame()
         {
             if (!doubleJumpedThisFrame)
@@ -226,7 +237,7 @@ namespace Jade.Player
                 return;
             }
 
-            if (abilities == null || !abilities.DashUnlocked || isGrounded || isDashing || airDashesRemaining <= 0 || dashCooldownCounter > 0f)
+            if (abilities == null || !abilities.DashUnlocked || isDashing || airDashesRemaining <= 0 || dashCooldownCounter > 0f)
             {
                 return;
             }
@@ -249,7 +260,7 @@ namespace Jade.Player
             dashTimer -= Time.fixedDeltaTime;
             body.velocity = new Vector2(dashDirection * settings.dashSpeed, settings.dashVerticalSpeed);
 
-            if (dashTimer <= 0f || isGrounded)
+            if (dashTimer <= 0f)
             {
                 isDashing = false;
             }
