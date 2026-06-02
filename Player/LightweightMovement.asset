@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e525f5f6908a437e9c4adffad7fbf6a2, type: 3}
+  m_Name: LightweightMovement
+  m_EditorClassIdentifier: 
+  maxRunSpeed: 8
+  groundAcceleration: 70
+  groundDeceleration: 90
+  turnDeceleration: 125
+  airAcceleration: 45
+  airDeceleration: 30
+  jumpHeight: 3.35
+  timeToJumpApex: 0.46
+  coyoteTime: 0.08
+  jumpBufferTime: 0.12
+  jumpCutVelocityMultiplier: 0.45
+  airJumpCount: 1
+  doubleJumpVelocityMultiplier: 0.88
+  fallGravityMultiplier: 1.55
+  lowJumpGravityMultiplier: 2.05
+  maxFallSpeed: 15
+  dashSpeed: 15
+  dashDuration: 0.26
+  dashCooldown: 0.15
+  dashVerticalSpeed: 0
+  airDashCount: 1
+  wallCheckDistance: 0.12
+  wallCheckHeight: 0.75
+  wallSlideMaxFallSpeed: 2.8
+  wallJumpHorizontalSpeed: 5.8
+  wallJumpVerticalMultiplier: 0.95
+  wallJumpControlLockTime: 0.06
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundCheckDistance: 0.06
+  groundCheckWidth: 0.82
