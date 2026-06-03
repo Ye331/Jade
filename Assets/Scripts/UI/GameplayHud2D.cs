@@ -321,7 +321,6 @@ namespace Jade.UI
         private void BuildAbilityBar()
         {
             GameObject root = CreateRect("AbilityBar", transform, new Vector2(560f, 270f), new Vector2(-38f, 42f), new Vector2(1f, 0f), new Vector2(1f, 0f));
-            CreateText("AbilityTitle", root.transform, "\u80fd\u529b", 34, TextAnchor.MiddleCenter, new Vector2(260f, 42f), new Vector2(276f, 232f), new Vector2(0f, 0f), new Vector2(0f, 0f), BorderColor);
 
             dashSlot = CreateAbilitySlot(root.transform, "DashSlot", "\u51b2\u523a", LoadSprite(DashIconResourcePath), new Vector2(156f, 0f));
             doubleJumpSlot = CreateAbilitySlot(root.transform, "DoubleJumpSlot", "\u4e8c\u6bb5\u8df3", LoadSprite(DoubleJumpIconResourcePath), new Vector2(394f, 0f));
