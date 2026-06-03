@@ -1716,8 +1716,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetSceneName: ShanhaiCave02
-  loadingSceneName: 
-  loadingMinimumSeconds: 0.75
+  loadingSceneName: LoadingCave
+  loadingMinimumSeconds: 1.25
 --- !u!61 &971432649
 BoxCollider2D:
   m_ObjectHideFlags: 0
