@@ -23,18 +23,31 @@ public class StoryVideoManager : MonoBehaviour
     [Header("剧情存档标记")]
     public string storyKey = "HasPlayedGlobalStory";
 
+    [Header("转场控制器")]
+    public SceneTransition sceneTransition; 
+
     private bool hasFinished = false;
 
     private void Start()
     {
+        // 判断是否第一次播放剧情
+        bool hasPlayed = PlayerPrefs.GetInt(storyKey, 0) == 1;
+
+        string targetScene = nextSceneName;
+
+        if (hasPlayed)
+        {
+            // 已播放过，跳到上次场景或默认场景
+            targetScene = PlayerPrefs.GetString("LastSceneName", nextSceneName);
+            LoadSceneWithTransition(targetScene);
+            return;
+        }
+
+        // 第一次播放剧情，绑定按钮和播放视频
         if (skipButton != null)
-        {
             skipButton.onClick.AddListener(SkipVideo);
-        }
         else
-        {
             Debug.LogWarning("StoryVideoManager：SkipButton 没有绑定。");
-        }
 
         if (videoPlayer != null)
         {
@@ -50,14 +63,10 @@ public class StoryVideoManager : MonoBehaviour
     private void OnDestroy()
     {
         if (skipButton != null)
-        {
             skipButton.onClick.RemoveListener(SkipVideo);
-        }
 
         if (videoPlayer != null)
-        {
             videoPlayer.loopPointReached -= OnVideoFinished;
-        }
     }
 
     private void OnVideoFinished(VideoPlayer vp)
@@ -74,33 +83,23 @@ public class StoryVideoManager : MonoBehaviour
     private void FinishStory()
     {
         if (hasFinished)
-        {
             return;
-        }
 
         hasFinished = true;
 
         if (videoPlayer != null)
-        {
             videoPlayer.Stop();
-        }
 
         if (videoScreen != null)
-        {
             videoScreen.gameObject.SetActive(false);
-        }
 
         if (skipButton != null)
-        {
             skipButton.gameObject.SetActive(false);
-        }
 
         PlayerPrefs.SetInt(storyKey, 1);
 
         if (!string.IsNullOrEmpty(nextSceneName))
-        {
             PlayerPrefs.SetString("LastSceneName", nextSceneName);
-        }
 
         PlayerPrefs.Save();
 
@@ -110,13 +109,26 @@ public class StoryVideoManager : MonoBehaviour
             return;
         }
 
-        if (!string.IsNullOrEmpty(nextSceneName))
+        // 使用统一转场跳转场景
+        LoadSceneWithTransition(nextSceneName);
+    }
+
+    private void LoadSceneWithTransition(string sceneName)
+    {
+        if (string.IsNullOrEmpty(sceneName))
         {
-            SceneManager.LoadScene(nextSceneName);
+            Debug.LogWarning("StoryVideoManager：目标场景名为空，直接返回。");
+            return;
+        }
+
+        if (sceneTransition != null)
+        {
+            sceneTransition.TransitionToScene(sceneName);
         }
         else
         {
-            Debug.LogWarning("StoryVideoManager：没有填写 nextSceneName。");
+            Debug.LogWarning("StoryVideoManager：没有绑定 SceneTransition，直接跳转。");
+            SceneManager.LoadScene(sceneName);
         }
     }
 }
