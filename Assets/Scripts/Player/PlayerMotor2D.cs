@@ -1,4 +1,5 @@
 using UnityEngine;
+using Jade.Audio;
 
 namespace Jade.Player
 {
@@ -14,6 +15,7 @@ namespace Jade.Player
         private Collider2D bodyCollider;
         private PlayerInputReader input;
         private PlayerAbilityInventory2D abilities;
+        private AudioSource audioSource;
         private Vector3 spawnPosition;
 
         private float coyoteCounter;
@@ -33,6 +35,18 @@ namespace Jade.Player
         private int airDashesRemaining;
         private int facingDirection = 1;
         private int dashDirection = 1;
+        private float footstepTimer;
+
+        [Header("Audio")]
+        [SerializeField] private AudioClip jumpClip;
+        [SerializeField] private AudioClip landClip;
+        [SerializeField] private AudioClip dashClip;
+        [SerializeField] private AudioClip footstepClip;
+        [SerializeField, Range(0f, 1f)] private float jumpVolume = 0.65f;
+        [SerializeField, Range(0f, 1f)] private float landVolume = 0.6f;
+        [SerializeField, Range(0f, 1f)] private float dashVolume = 0.65f;
+        [SerializeField, Range(0f, 1f)] private float footstepVolume = 0.45f;
+        [SerializeField] private float footstepInterval = 0.32f;
 
         public int FacingDirection => facingDirection;
         public bool IsGrounded => isGrounded;
@@ -64,6 +78,14 @@ namespace Jade.Player
             bodyCollider = GetComponent<Collider2D>();
             input = GetComponent<PlayerInputReader>();
             abilities = GetComponent<PlayerAbilityInventory2D>();
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f;
             if (abilities == null)
             {
                 abilities = gameObject.AddComponent<PlayerAbilityInventory2D>();
@@ -75,6 +97,7 @@ namespace Jade.Player
             RecalculateJumpValues();
             ResetAirJumpCount();
             ResetAirDashCount();
+            LoadDefaultAudioClips();
         }
 
         private void OnValidate()
@@ -91,6 +114,7 @@ namespace Jade.Player
 
             landedThisFrame = false;
             jumpedThisFrame = false;
+            doubleJumpedThisFrame = false;
             dashedThisFrame = false;
             wasGrounded = isGrounded;
 
@@ -106,6 +130,7 @@ namespace Jade.Player
             HandleJumpInput();
             HandleRun();
             HandleGravity();
+            HandleFootstepAudio();
         }
 
         public void RespawnAtSpawnPoint()
@@ -180,6 +205,10 @@ namespace Jade.Player
 
             isGrounded = foundGround && body.velocity.y <= 0.05f;
             landedThisFrame = isGrounded && !wasGrounded;
+            if (landedThisFrame)
+            {
+                PlayClip(landClip, landVolume);
+            }
 
             if (isGrounded)
             {
@@ -237,6 +266,7 @@ namespace Jade.Player
             jumpBufferCounter = 0f;
 
             body.velocity = new Vector2(dashDirection * settings.dashSpeed, settings.dashVerticalSpeed);
+            PlayClip(dashClip, dashVolume);
         }
 
         private void HandleDash()
@@ -272,6 +302,7 @@ namespace Jade.Player
                 coyoteCounter = 0f;
                 isGrounded = false;
                 jumpedThisFrame = true;
+                PlayClip(jumpClip, jumpVolume);
                 return;
             }
 
@@ -286,6 +317,7 @@ namespace Jade.Player
                 coyoteCounter = 0f;
                 isGrounded = false;
                 doubleJumpedThisFrame = true;
+                PlayClip(jumpClip, jumpVolume);
             }
 
             if (input.ConsumeJumpReleased() && body.velocity.y > 0f)
@@ -360,6 +392,55 @@ namespace Jade.Player
             }
 
             body.velocity = velocity;
+        }
+
+        private void LoadDefaultAudioClips()
+        {
+            if (jumpClip == null)
+            {
+                jumpClip = GameAudio2D.LoadClip(GameAudio2D.JumpResourcePath);
+            }
+
+            if (landClip == null)
+            {
+                landClip = GameAudio2D.LoadClip(GameAudio2D.LandResourcePath);
+            }
+
+            if (dashClip == null)
+            {
+                dashClip = GameAudio2D.LoadClip(GameAudio2D.DashResourcePath);
+            }
+
+            if (footstepClip == null)
+            {
+                footstepClip = GameAudio2D.LoadClip(GameAudio2D.FootstepResourcePath);
+            }
+        }
+
+        private void HandleFootstepAudio()
+        {
+            if (!isGrounded || Mathf.Abs(body.velocity.x) < 0.15f)
+            {
+                footstepTimer = 0f;
+                return;
+            }
+
+            footstepTimer -= Time.fixedDeltaTime;
+            if (footstepTimer > 0f)
+            {
+                return;
+            }
+
+            PlayClip(footstepClip, footstepVolume);
+            footstepTimer = Mathf.Max(0.05f, footstepInterval);
+        }
+
+        private void PlayClip(AudioClip clip, float volume)
+        {
+            if (audioSource != null && clip != null && volume > 0f)
+            {
+                audioSource.PlayOneShot(clip, volume);
+            }
         }
 
     }

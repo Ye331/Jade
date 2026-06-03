@@ -1,4 +1,5 @@
 using Jade.Player;
+using Jade.Audio;
 using UnityEngine;
 
 namespace Jade.World
@@ -22,6 +23,7 @@ namespace Jade.World
             }
 
             collectedCount++;
+            GameAudio2D.PlayOneShot2D(GameAudio2D.CoinPickResourcePath, 0.7f);
             Debug.Log("Collected jade shard: " + collectedCount);
             gameObject.SetActive(false);
         }
