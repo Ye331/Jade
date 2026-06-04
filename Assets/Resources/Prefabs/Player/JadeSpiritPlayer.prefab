@@ -9985,6 +9985,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dashUnlocked: 0
+  doubleJumpUnlocked: 0
 --- !u!95 &1686587295843137145
 Animator:
   serializedVersion: 6

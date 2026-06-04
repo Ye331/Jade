@@ -2079,7 +2079,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dashUnlocked: 0
   doubleJumpUnlocked: 0
-  wallJumpUnlocked: 0
 --- !u!114 &943138021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2644,8 +2643,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetSceneName: ShanhaiCave03
-  loadingSceneName: 
-  loadingMinimumSeconds: 0.75
+  loadingSceneName: LoadingCave
+  loadingMinimumSeconds: 1.25
 --- !u!61 &1103000498
 BoxCollider2D:
   m_ObjectHideFlags: 0

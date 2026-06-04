@@ -1,4 +1,5 @@
 using UnityEngine;
+using Jade.Audio;
 
 namespace Jade.Player
 {
@@ -14,39 +15,46 @@ namespace Jade.Player
         private Collider2D bodyCollider;
         private PlayerInputReader input;
         private PlayerAbilityInventory2D abilities;
+        private AudioSource audioSource;
         private Vector3 spawnPosition;
 
         private float coyoteCounter;
         private float jumpBufferCounter;
         private float dashTimer;
         private float dashCooldownCounter;
-        private float wallJumpControlLockCounter;
         private float gravity;
         private float jumpVelocity;
         private bool isGrounded;
         private bool wasGrounded;
-        private bool isTouchingWall;
         private bool landedThisFrame;
         private bool jumpedThisFrame;
         private bool doubleJumpedThisFrame;
-        private bool wallJumpedThisFrame;
         private bool dashedThisFrame;
         private bool isDashing;
         private int airJumpsRemaining;
         private int airDashesRemaining;
         private int facingDirection = 1;
         private int dashDirection = 1;
-        private int wallDirection;
+        private float footstepTimer;
+
+        [Header("Audio")]
+        [SerializeField] private AudioClip jumpClip;
+        [SerializeField] private AudioClip landClip;
+        [SerializeField] private AudioClip dashClip;
+        [SerializeField] private AudioClip footstepClip;
+        [SerializeField, Range(0f, 1f)] private float jumpVolume = 0.65f;
+        [SerializeField, Range(0f, 1f)] private float landVolume = 0.6f;
+        [SerializeField, Range(0f, 1f)] private float dashVolume = 0.65f;
+        [SerializeField, Range(0f, 1f)] private float footstepVolume = 0.45f;
+        [SerializeField] private float footstepInterval = 0.32f;
 
         public int FacingDirection => facingDirection;
         public bool IsGrounded => isGrounded;
         public bool LandedThisFrame => landedThisFrame;
         public bool JumpedThisFrame => jumpedThisFrame;
         public bool DoubleJumpedThisFrame => doubleJumpedThisFrame;
-        public bool WallJumpedThisFrame => wallJumpedThisFrame;
         public bool DashedThisFrame => dashedThisFrame;
         public bool IsDashing => isDashing;
-        public bool IsTouchingWall => isTouchingWall;
         public Vector2 Velocity => body != null ? body.velocity : Vector2.zero;
         public float VerticalSpeed => body != null ? body.velocity.y : 0f;
         public float Speed01 => settings != null && settings.maxRunSpeed > 0f
@@ -70,6 +78,14 @@ namespace Jade.Player
             bodyCollider = GetComponent<Collider2D>();
             input = GetComponent<PlayerInputReader>();
             abilities = GetComponent<PlayerAbilityInventory2D>();
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f;
             if (abilities == null)
             {
                 abilities = gameObject.AddComponent<PlayerAbilityInventory2D>();
@@ -81,6 +97,7 @@ namespace Jade.Player
             RecalculateJumpValues();
             ResetAirJumpCount();
             ResetAirDashCount();
+            LoadDefaultAudioClips();
         }
 
         private void OnValidate()
@@ -97,12 +114,11 @@ namespace Jade.Player
 
             landedThisFrame = false;
             jumpedThisFrame = false;
-            wallJumpedThisFrame = false;
+            doubleJumpedThisFrame = false;
             dashedThisFrame = false;
             wasGrounded = isGrounded;
 
             UpdateGroundedState();
-            UpdateWallState();
             UpdateTimers();
             TryStartDash();
             if (isDashing)
@@ -113,8 +129,8 @@ namespace Jade.Player
 
             HandleJumpInput();
             HandleRun();
-            HandleWallSlide();
             HandleGravity();
+            HandleFootstepAudio();
         }
 
         public void RespawnAtSpawnPoint()
@@ -123,7 +139,6 @@ namespace Jade.Player
             transform.position = spawnPosition;
             isDashing = false;
             dashTimer = 0f;
-            wallJumpControlLockCounter = 0f;
             ResetAirJumpCount();
             ResetAirDashCount();
         }
@@ -139,7 +154,6 @@ namespace Jade.Player
             body.velocity = velocity;
             isDashing = false;
             dashTimer = 0f;
-            wallJumpControlLockCounter = 0f;
             ResetAirJumpCount();
             ResetAirDashCount();
         }
@@ -191,6 +205,10 @@ namespace Jade.Player
 
             isGrounded = foundGround && body.velocity.y <= 0.05f;
             landedThisFrame = isGrounded && !wasGrounded;
+            if (landedThisFrame)
+            {
+                PlayClip(landClip, landVolume);
+            }
 
             if (isGrounded)
             {
@@ -217,11 +235,6 @@ namespace Jade.Player
             if (dashCooldownCounter > 0f)
             {
                 dashCooldownCounter -= step;
-            }
-
-            if (wallJumpControlLockCounter > 0f)
-            {
-                wallJumpControlLockCounter -= step;
             }
 
             if (input.ConsumeJumpPressed())
@@ -253,6 +266,7 @@ namespace Jade.Player
             jumpBufferCounter = 0f;
 
             body.velocity = new Vector2(dashDirection * settings.dashSpeed, settings.dashVerticalSpeed);
+            PlayClip(dashClip, dashVolume);
         }
 
         private void HandleDash()
@@ -288,23 +302,7 @@ namespace Jade.Player
                 coyoteCounter = 0f;
                 isGrounded = false;
                 jumpedThisFrame = true;
-                return;
-            }
-
-            if (jumpBufferCounter > 0f && CanWallJump())
-            {
-                int jumpDirection = -wallDirection;
-                Vector2 velocity = body.velocity;
-                velocity.x = jumpDirection * settings.wallJumpHorizontalSpeed;
-                velocity.y = jumpVelocity * settings.wallJumpVerticalMultiplier;
-                body.velocity = velocity;
-
-                facingDirection = jumpDirection;
-                wallJumpControlLockCounter = settings.wallJumpControlLockTime;
-                jumpBufferCounter = 0f;
-                coyoteCounter = 0f;
-                isGrounded = false;
-                wallJumpedThisFrame = true;
+                PlayClip(jumpClip, jumpVolume);
                 return;
             }
 
@@ -319,6 +317,7 @@ namespace Jade.Player
                 coyoteCounter = 0f;
                 isGrounded = false;
                 doubleJumpedThisFrame = true;
+                PlayClip(jumpClip, jumpVolume);
             }
 
             if (input.ConsumeJumpReleased() && body.velocity.y > 0f)
@@ -338,22 +337,8 @@ namespace Jade.Player
                 && airJumpsRemaining > 0;
         }
 
-        private bool CanWallJump()
-        {
-            return abilities != null
-                && abilities.WallJumpUnlocked
-                && !isGrounded
-                && isTouchingWall
-                && wallDirection != 0;
-        }
-
         private void HandleRun()
         {
-            if (wallJumpControlLockCounter > 0f)
-            {
-                return;
-            }
-
             float horizontal = input.Horizontal;
 
             if (Mathf.Abs(horizontal) > 0.01f)
@@ -380,18 +365,6 @@ namespace Jade.Player
 
             float newX = Mathf.MoveTowards(currentSpeed, targetSpeed, rate * Time.fixedDeltaTime);
             body.velocity = new Vector2(newX, body.velocity.y);
-        }
-
-        private void HandleWallSlide()
-        {
-            if (!CanWallJump() || body.velocity.y >= 0f)
-            {
-                return;
-            }
-
-            Vector2 velocity = body.velocity;
-            velocity.y = Mathf.Max(velocity.y, -settings.wallSlideMaxFallSpeed);
-            body.velocity = velocity;
         }
 
         private void HandleGravity()
@@ -421,50 +394,54 @@ namespace Jade.Player
             body.velocity = velocity;
         }
 
-        private void UpdateWallState()
+        private void LoadDefaultAudioClips()
         {
-            isTouchingWall = false;
-            wallDirection = 0;
+            if (jumpClip == null)
+            {
+                jumpClip = GameAudio2D.LoadClip(GameAudio2D.JumpResourcePath);
+            }
 
-            if (settings == null || bodyCollider == null)
+            if (landClip == null)
+            {
+                landClip = GameAudio2D.LoadClip(GameAudio2D.LandResourcePath);
+            }
+
+            if (dashClip == null)
+            {
+                dashClip = GameAudio2D.LoadClip(GameAudio2D.DashResourcePath);
+            }
+
+            if (footstepClip == null)
+            {
+                footstepClip = GameAudio2D.LoadClip(GameAudio2D.FootstepResourcePath);
+            }
+        }
+
+        private void HandleFootstepAudio()
+        {
+            if (!isGrounded || Mathf.Abs(body.velocity.x) < 0.15f)
+            {
+                footstepTimer = 0f;
+                return;
+            }
+
+            footstepTimer -= Time.fixedDeltaTime;
+            if (footstepTimer > 0f)
             {
                 return;
             }
 
-            Bounds bounds = bodyCollider.bounds;
-            Vector2 checkSize = new Vector2(bounds.size.x, bounds.size.y * settings.wallCheckHeight);
-            if (CheckWall(bounds.center, checkSize, Vector2.right, 1))
-            {
-                return;
-            }
-
-            CheckWall(bounds.center, checkSize, Vector2.left, -1);
+            PlayClip(footstepClip, footstepVolume);
+            footstepTimer = Mathf.Max(0.05f, footstepInterval);
         }
 
-        private bool CheckWall(Vector2 origin, Vector2 checkSize, Vector2 direction, int directionSign)
+        private void PlayClip(AudioClip clip, float volume)
         {
-            RaycastHit2D[] hits = Physics2D.BoxCastAll(
-                origin,
-                checkSize,
-                0f,
-                direction,
-                settings.wallCheckDistance,
-                settings.groundLayer);
-
-            for (int i = 0; i < hits.Length; i++)
+            if (audioSource != null && clip != null && volume > 0f)
             {
-                Collider2D hitCollider = hits[i].collider;
-                if (hitCollider == null || hitCollider == bodyCollider || hitCollider.isTrigger)
-                {
-                    continue;
-                }
-
-                isTouchingWall = true;
-                wallDirection = directionSign;
-                return true;
+                audioSource.PlayOneShot(clip, volume);
             }
-
-            return false;
         }
+
     }
 }

@@ -135,7 +135,7 @@ namespace Jade.World
             CreateBox(sprite, "S1_DoubleJumpGate_Rise02", new Vector2(50f, 1.75f), new Vector2(2.7f, 0.45f), PlatformColor(RouteBand.AbilityGate));
             CreateBox(sprite, "S1_ReturnShard_EarlyTease", new Vector2(31.3f, 2.55f), new Vector2(4f, 0.45f), PlatformColor(RouteBand.Shard));
 
-            // Segment 2: lake, bamboo jumps, hazards, and wall-jump pickup.
+            // Segment 2: lake, bamboo jumps, hazards, and final climb approach.
             CreateBox(sprite, "S2_LakeEntry_CheckpointPlatform", new Vector2(57f, 1.45f), new Vector2(7f, 0.55f), PlatformColor(RouteBand.Checkpoint));
             CreateHazard(sprite, "S2_LakeWater_Hazard", new Vector2(70f, -2.6f), new Vector2(23f, 0.55f), HazardColor(HazardBand.Water));
             CreateBox(sprite, "S2_LakeSkip_01", new Vector2(65f, -0.45f), new Vector2(2.3f, 0.35f), PlatformColor(RouteBand.Jump));
@@ -148,17 +148,17 @@ namespace Jade.World
             CreateBox(sprite, "S2_SwingPole_Anchor", new Vector2(101f, 2.1f), new Vector2(0.55f, 5.5f), PlatformColor(RouteBand.Mechanism));
             CreateBox(sprite, "S2_SwingPole_Blade", new Vector2(103.2f, 1.65f), new Vector2(4.7f, 0.28f), PlatformColor(RouteBand.Mechanism));
             CreateHazard(sprite, "S2_SwingPole_Hazard", new Vector2(103.2f, 1.65f), new Vector2(4.7f, 0.28f), HazardColor(HazardBand.Mechanism));
-            CreateBox(sprite, "S2_WallJumpPickup_Platform", new Vector2(110f, 0.75f), new Vector2(5.6f, 0.55f), PlatformColor(RouteBand.Ability));
+            CreateBox(sprite, "S2_FinalClimbApproach_Platform", new Vector2(110f, 0.75f), new Vector2(5.6f, 0.55f), PlatformColor(RouteBand.Main));
             CreateHazard(sprite, "S2_BambooSpike_Hazard", new Vector2(115.2f, 1.35f), new Vector2(2f, 0.75f), HazardColor(HazardBand.Spike));
-            CreateBox(sprite, "S2_ExitBeforeWallShaft", new Vector2(119f, 0.75f), new Vector2(5.5f, 0.55f), PlatformColor(RouteBand.Main));
+            CreateBox(sprite, "S2_ExitBeforeFinalClimb", new Vector2(119f, 0.75f), new Vector2(5.5f, 0.55f), PlatformColor(RouteBand.Main));
 
-            // Segment 3: wall-jump shaft, last shards, and four-shard gate.
-            CreateBox(sprite, "S3_WallGate_Floor", new Vector2(127f, 0.75f), new Vector2(7f, 0.55f), PlatformColor(RouteBand.Checkpoint));
-            CreateBox(sprite, "S3_LeftWallJumpWall", new Vector2(131f, 4.3f), new Vector2(0.8f, 8.2f), PlatformColor(RouteBand.Wall));
-            CreateBox(sprite, "S3_RightWallJumpWall", new Vector2(137f, 6.1f), new Vector2(0.8f, 8.2f), PlatformColor(RouteBand.Wall));
-            CreateHazard(sprite, "S3_WallShaft_BottomSpikes", new Vector2(134f, -0.1f), new Vector2(4.2f, 0.55f), HazardColor(HazardBand.Spike));
-            CreateBox(sprite, "S3_WallShaft_Rest01", new Vector2(140.8f, 5.8f), new Vector2(3.1f, 0.45f), PlatformColor(RouteBand.AbilityGate));
-            CreateBox(sprite, "S3_WallShaft_Rest02", new Vector2(133.4f, 10.25f), new Vector2(3.1f, 0.45f), PlatformColor(RouteBand.AbilityGate));
+            // Segment 3: double-jump climb, last shards, and four-shard gate.
+            CreateBox(sprite, "S3_FinalClimb_Floor", new Vector2(127f, 0.75f), new Vector2(7f, 0.55f), PlatformColor(RouteBand.Checkpoint));
+            CreateHazard(sprite, "S3_FinalClimb_BottomSpikes", new Vector2(134f, -0.1f), new Vector2(4.2f, 0.55f), HazardColor(HazardBand.Spike));
+            CreateBox(sprite, "S3_FinalClimb_Step01", new Vector2(132.5f, 2.65f), new Vector2(3.2f, 0.45f), PlatformColor(RouteBand.AbilityGate));
+            CreateBox(sprite, "S3_FinalClimb_Step02", new Vector2(138.5f, 4.45f), new Vector2(3.2f, 0.45f), PlatformColor(RouteBand.AbilityGate));
+            CreateBox(sprite, "S3_FinalClimb_Step03", new Vector2(140.8f, 6.35f), new Vector2(3.1f, 0.45f), PlatformColor(RouteBand.AbilityGate));
+            CreateBox(sprite, "S3_FinalClimb_Step04", new Vector2(133.4f, 9.45f), new Vector2(3.1f, 0.45f), PlatformColor(RouteBand.AbilityGate));
             CreateBox(sprite, "S3_UpperReturn_Ledge", new Vector2(144.5f, 11.6f), new Vector2(6f, 0.5f), PlatformColor(RouteBand.Return));
             CreateBox(sprite, "S3_DropCatch_ToFinal", new Vector2(151f, 5.4f), new Vector2(4.8f, 0.5f), PlatformColor(RouteBand.Main));
             CreateBox(sprite, "S3_FinalShard_Ledge", new Vector2(156.5f, 7.9f), new Vector2(4.2f, 0.45f), PlatformColor(RouteBand.Shard));
@@ -170,20 +170,19 @@ namespace Jade.World
         {
             CreateDashAbilityPickup(sprite, new Vector2(11.5f, -1.55f));
             CreateDoubleJumpAbilityPickup(sprite, new Vector2(38f, -0.65f));
-            CreateWallJumpAbilityPickup(sprite, new Vector2(110f, 1.45f));
         }
 
         private void CreateCheckpoints(Sprite sprite)
         {
             CreateCheckpoint(sprite, "Checkpoint_01_AfterDoubleJump", new Vector2(57f, 2f));
-            CreateCheckpoint(sprite, "Checkpoint_02_WallJumpShaft", new Vector2(127f, 1.3f));
+            CreateCheckpoint(sprite, "Checkpoint_02_FinalClimb", new Vector2(127f, 1.3f));
         }
 
         private void CreateShards(Sprite sprite)
         {
             CreateShard(sprite, "Shard_01_ReturnAfterDoubleJump", new Vector2(31.3f, 3.25f));
             CreateShard(sprite, "Shard_02_BambooCanopy", new Vector2(94f, 5.05f));
-            CreateShard(sprite, "Shard_03_WallShaftUpper", new Vector2(144.5f, 12.3f));
+            CreateShard(sprite, "Shard_03_FinalClimbUpper", new Vector2(144.5f, 12.3f));
             CreateShard(sprite, "Shard_04_FinalHighLedge", new Vector2(156.5f, 8.6f));
         }
 
@@ -266,12 +265,6 @@ namespace Jade.World
         {
             GameObject pickup = CreatePickupBase(sprite, "AbilityPickup_02_DoubleJump", position, new Color(0.72f, 0.95f, 1f, 1f));
             pickup.AddComponent<DoubleJumpAbilityPickup2D>().Configure(pickup.GetComponent<SpriteRenderer>());
-        }
-
-        private void CreateWallJumpAbilityPickup(Sprite sprite, Vector2 position)
-        {
-            GameObject pickup = CreatePickupBase(sprite, "AbilityPickup_03_WallJump", position, new Color(0.95f, 0.86f, 0.45f, 1f));
-            pickup.AddComponent<WallJumpAbilityPickup2D>().Configure(pickup.GetComponent<SpriteRenderer>());
         }
 
         private static GameObject CreatePickupBase(Sprite sprite, string name, Vector2 position, Color color)
@@ -400,8 +393,6 @@ namespace Jade.World
                     return new Color(0.23f, 0.38f, 0.23f);
                 case RouteBand.Mechanism:
                     return new Color(0.42f, 0.31f, 0.22f);
-                case RouteBand.Wall:
-                    return new Color(0.28f, 0.28f, 0.32f);
                 case RouteBand.Goal:
                     return new Color(0.33f, 0.27f, 0.18f);
                 default:
@@ -482,7 +473,6 @@ namespace Jade.World
             Checkpoint,
             Bamboo,
             Mechanism,
-            Wall,
             Goal
         }
 

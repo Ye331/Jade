@@ -33,12 +33,6 @@ MonoBehaviour:
   dashCooldown: 0.15
   dashVerticalSpeed: 0
   airDashCount: 1
-  wallCheckDistance: 0.12
-  wallCheckHeight: 0.75
-  wallSlideMaxFallSpeed: 2.8
-  wallJumpHorizontalSpeed: 5.8
-  wallJumpVerticalMultiplier: 0.95
-  wallJumpControlLockTime: 0.06
   groundLayer:
     serializedVersion: 2
     m_Bits: 4294967295
