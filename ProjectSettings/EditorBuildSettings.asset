@@ -32,6 +32,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ShanhaiCave03.scene
     guid: 769ce41067a67874ca283fdd2b5a61c8
+  - enabled: 1
+    path: Assets/Scenes/Prototype/MainMenu.scene
+    guid: c49f8c3963dc6164eb3e9cd1bf27a786
+  - enabled: 1
+    path: Assets/Scenes/Prototype/StoryIntro.scene
+    guid: 7e2518fdeb6010b4e9c6b390f21507b4
   m_BuildProfiles: []
   m_configObjects: {}
   m_SlimFeaturesWeixinMiniGame:
