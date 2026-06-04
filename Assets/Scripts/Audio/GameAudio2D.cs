@@ -16,6 +16,7 @@ namespace Jade.Audio
         private static readonly Dictionary<string, AudioClip> ClipCache = new Dictionary<string, AudioClip>();
         private static AudioSource bgmSource;
         private static AudioSource sfxSource;
+        private static bool isBgmPaused;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Initialize()
@@ -56,7 +57,42 @@ namespace Jade.Audio
             bgmSource.playOnAwake = false;
             bgmSource.spatialBlend = 0f;
             bgmSource.volume = 0.35f;
-            bgmSource.Play();
+            if (isBgmPaused)
+            {
+                bgmSource.Pause();
+            }
+            else
+            {
+                bgmSource.Play();
+            }
+        }
+
+        public static void PauseBgm()
+        {
+            isBgmPaused = true;
+            StartBgm();
+
+            if (bgmSource != null && bgmSource.isPlaying)
+            {
+                bgmSource.Pause();
+            }
+        }
+
+        public static void ResumeBgm()
+        {
+            isBgmPaused = false;
+            StartBgm();
+
+            if (bgmSource == null || bgmSource.isPlaying)
+            {
+                return;
+            }
+
+            bgmSource.UnPause();
+            if (!bgmSource.isPlaying)
+            {
+                bgmSource.Play();
+            }
         }
 
         public static AudioClip LoadClip(string resourcePath)

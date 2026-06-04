@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using UnityEngine.SceneManagement;
+using Jade.Audio;
 
 public class StoryVideoManager : MonoBehaviour
 {
@@ -24,9 +25,29 @@ public class StoryVideoManager : MonoBehaviour
     public string storyKey = "HasPlayedGlobalStory";
 
     [Header("转场控制器")]
-    public SceneTransition sceneTransition; 
+    public SceneTransition sceneTransition;
+
+    [Header("播放剧情视频时暂停背景音乐")]
+    public bool pauseBgmDuringVideo = true;
+
+    [Header("跳转淡出时保留视频画面作为背景")]
+    public bool keepVideoScreenDuringTransition = true;
 
     private bool hasFinished = false;
+    private bool pausedBgm = false;
+
+    private void Awake()
+    {
+        if (videoPlayer != null)
+        {
+            videoPlayer.playOnAwake = false;
+        }
+
+        if (PlayerPrefs.GetInt(storyKey, 0) != 1)
+        {
+            PauseBgmForStoryVideo();
+        }
+    }
 
     private void Start()
     {
@@ -51,6 +72,7 @@ public class StoryVideoManager : MonoBehaviour
 
         if (videoPlayer != null)
         {
+            PauseBgmForStoryVideo();
             videoPlayer.loopPointReached += OnVideoFinished;
             videoPlayer.Play();
         }
@@ -67,6 +89,8 @@ public class StoryVideoManager : MonoBehaviour
 
         if (videoPlayer != null)
             videoPlayer.loopPointReached -= OnVideoFinished;
+
+        ResumeBgmAfterStoryVideo();
     }
 
     private void OnVideoFinished(VideoPlayer vp)
@@ -87,10 +111,20 @@ public class StoryVideoManager : MonoBehaviour
 
         hasFinished = true;
 
-        if (videoPlayer != null)
-            videoPlayer.Stop();
+        bool shouldTransition = !testMode && !string.IsNullOrEmpty(nextSceneName);
+        bool keepVideoBackground = shouldTransition && keepVideoScreenDuringTransition;
 
-        if (videoScreen != null)
+        if (videoPlayer != null)
+        {
+            if (keepVideoBackground)
+                videoPlayer.Pause();
+            else
+                videoPlayer.Stop();
+        }
+
+        ResumeBgmAfterStoryVideo();
+
+        if (videoScreen != null && !keepVideoBackground)
             videoScreen.gameObject.SetActive(false);
 
         if (skipButton != null)
@@ -130,5 +164,27 @@ public class StoryVideoManager : MonoBehaviour
             Debug.LogWarning("StoryVideoManager：没有绑定 SceneTransition，直接跳转。");
             SceneManager.LoadScene(sceneName);
         }
+    }
+
+    private void PauseBgmForStoryVideo()
+    {
+        if (!pauseBgmDuringVideo || pausedBgm)
+        {
+            return;
+        }
+
+        GameAudio2D.PauseBgm();
+        pausedBgm = true;
+    }
+
+    private void ResumeBgmAfterStoryVideo()
+    {
+        if (!pausedBgm)
+        {
+            return;
+        }
+
+        GameAudio2D.ResumeBgm();
+        pausedBgm = false;
     }
 }
