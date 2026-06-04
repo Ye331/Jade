@@ -46,7 +46,7 @@ namespace Jade.Player
         [SerializeField, Range(0f, 1f)] private float landVolume = 0.6f;
         [SerializeField, Range(0f, 1f)] private float dashVolume = 0.65f;
         [SerializeField, Range(0f, 1f)] private float footstepVolume = 0.45f;
-        [SerializeField] private float footstepInterval = 0.32f;
+        [SerializeField] private float footstepInterval = 0.4f;
 
         public int FacingDirection => facingDirection;
         public bool IsGrounded => isGrounded;

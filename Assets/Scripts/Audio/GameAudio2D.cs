@@ -5,13 +5,13 @@ namespace Jade.Audio
 {
     public static class GameAudio2D
     {
-        private const string BgmResourcePath = "Audio/BGM/game_bgm";
+        private const string BgmResourcePath = "Audio/BGM/game_bgm2";
         public const string JumpResourcePath = "Audio/SFX/jump";
         public const string LandResourcePath = "Audio/SFX/landed";
         public const string CoinPickResourcePath = "Audio/SFX/pick_coins";
         public const string SkillPickResourcePath = "Audio/SFX/pick_skills";
         public const string DashResourcePath = "Audio/SFX/rush";
-        public const string FootstepResourcePath = "Audio/SFX/walk_sound";
+        public const string FootstepResourcePath = "Audio/SFX/walk8";
 
         private static readonly Dictionary<string, AudioClip> ClipCache = new Dictionary<string, AudioClip>();
         private static AudioSource bgmSource;
