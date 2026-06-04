@@ -1996,6 +1996,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 3
+  damageFlashColor: {r: 1, g: 0.22, b: 0.18, a: 1}
+  damageFlashDuration: 0.55
+  damageFlashInterval: 0.08
 --- !u!114 &943138016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2092,6 +2095,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: 2b4503282e4e40488a1fe41eb4bbf774, type: 2}
+  jumpClip: {fileID: 0}
+  landClip: {fileID: 0}
+  dashClip: {fileID: 0}
+  footstepClip: {fileID: 0}
+  jumpVolume: 0.65
+  landVolume: 0.6
+  dashVolume: 0.65
+  footstepVolume: 0.45
+  footstepInterval: 0.32
 --- !u!114 &943138022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2644,7 +2656,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetSceneName: ShanhaiCave03
   loadingSceneName: LoadingCave
-  loadingMinimumSeconds: 1.25
+  loadingMinimumSeconds: 1
 --- !u!61 &1103000498
 BoxCollider2D:
   m_ObjectHideFlags: 0

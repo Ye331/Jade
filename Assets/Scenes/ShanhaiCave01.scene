@@ -1474,18 +1474,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 3
---- !u!114 &943138026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943138014}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f4f5be0a45d4e7d8e80d8ac6d8d9275, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  damageFlashColor: {r: 1, g: 0.22, b: 0.18, a: 1}
+  damageFlashDuration: 0.55
+  damageFlashInterval: 0.08
 --- !u!114 &943138016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1582,6 +1573,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   settings: {fileID: 11400000, guid: 2b4503282e4e40488a1fe41eb4bbf774, type: 2}
+  jumpClip: {fileID: 0}
+  landClip: {fileID: 0}
+  dashClip: {fileID: 0}
+  footstepClip: {fileID: 0}
+  jumpVolume: 0.65
+  landVolume: 0.6
+  dashVolume: 0.65
+  footstepVolume: 0.45
+  footstepInterval: 0.32
 --- !u!114 &943138022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1684,6 +1684,18 @@ Transform:
   - {fileID: 1533297916}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &943138026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943138014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f4f5be0a45d4e7d8e80d8ac6d8d9275, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &971432647
 GameObject:
   m_ObjectHideFlags: 0
@@ -1717,7 +1729,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetSceneName: ShanhaiCave02
   loadingSceneName: LoadingCave
-  loadingMinimumSeconds: 1.25
+  loadingMinimumSeconds: 1
 --- !u!61 &971432649
 BoxCollider2D:
   m_ObjectHideFlags: 0

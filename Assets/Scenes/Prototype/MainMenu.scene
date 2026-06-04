@@ -323,7 +323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ac5ab3bc82480b4d9977dd7f4c95478, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fadeImage: {fileID: 0}
+  fadeImage: {fileID: 1578604944}
   fadeOutDuration: 0.6
   fadeInDuration: 0.4
   fadeInOnStart: 1
@@ -2120,7 +2120,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1911873459
 RectTransform:
   m_ObjectHideFlags: 0
